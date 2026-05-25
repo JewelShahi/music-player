@@ -68,7 +68,7 @@ export default function Player() {
       id="seekSlider"
       type="range" min="0" max="1000" 
       value={currentSliderVal}
-      className={`seek-filled w-full h-1 cursor-pointer rounded-none ${className || ""}`}
+      className={`range seek-filled w-full h-1 cursor-pointer rounded-none ${className || ""}`}
       style={{ "--val": `${currentPct}%` }}
       onMouseDown={handleSeekStart} onTouchStart={handleSeekStart}
       onChange={handleSeekChange}
@@ -164,7 +164,7 @@ export default function Player() {
               <input 
                 type="range" min="0" max="1" step="0.01" 
                 value={isVolDragging ? volVal : volume} 
-                className="vol-filled w-24" 
+                className="range vol-filled w-24" 
                 style={{ "--val": `${(isVolDragging ? volVal : volume) * 100}%` }} 
                 onMouseDown={handleVolStart} onTouchStart={handleVolStart}
                 onChange={handleVolChange}
