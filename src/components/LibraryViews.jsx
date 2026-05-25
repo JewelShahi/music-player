@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { usePlayer } from "../context/PlayerContext";
+import AlbumArt from "./AlbumArt"; // <-- ADDED IMPORT
 import { ListMusic, Heart, Play, Shuffle, X, Trash2, ListPlus } from "lucide-react";
 
 // ── Custom Hook: Checks if text is actually truncating ──
@@ -49,7 +50,12 @@ function QueueItem({ track, index, isActive, isPlaying, playFromQueue, removeFro
               </span>
             ) : index + 1}
           </span>
-          <img src={track.image || ""} alt="" className="w-11 h-11 rounded-lg object-cover bg-base-300 shrink-0 shadow-md shadow-black/20" onError={(e) => { e.target.style.display = "none"; }} />
+          
+          {/* REPLACED IMG WITH ALBUMART */}
+          <AlbumArt 
+            src={track.image} 
+            className="w-11 h-11 rounded-lg object-cover bg-base-300 shrink-0 shadow-md shadow-black/20" 
+          />
           
           <div className="min-w-0 flex-1">
             {shouldScroll ? (
@@ -127,7 +133,12 @@ function LikedItem({ track, index, isActive, isPlaying, playFromLiked, toggleLik
               </span>
             ) : index + 1}
           </span>
-          <img src={track.image || ""} alt="" className="w-11 h-11 rounded-lg object-cover bg-base-300 shrink-0 shadow-md shadow-black/20" onError={(e) => { e.target.style.display = "none"; }} />
+          
+          {/* REPLACED IMG WITH ALBUMART */}
+          <AlbumArt 
+            src={track.image} 
+            className="w-11 h-11 rounded-lg object-cover bg-base-300 shrink-0 shadow-md shadow-black/20" 
+          />
           
           <div className="min-w-0 flex-1">
             {shouldScroll ? (
@@ -172,7 +183,7 @@ function LikedItem({ track, index, isActive, isPlaying, playFromLiked, toggleLik
         </div>
       </div>
       <button onClick={() => toggleLike(track)} className="btn btn-ghost btn-xs sm:opacity-0 group-hover:sm:opacity-100 text-error hover:text-error mr-1 transition-all" title="Remove from Liked">
-        <Heart size={16} className="fill-current" /> {/* Changed to fill-current for proper Tailwind SVG coloring */}
+        <Heart size={16} className="fill-current" />
       </button>
     </div>
   );
