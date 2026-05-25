@@ -196,3 +196,64 @@
     transform: translateY(0);
   }
 }
+
+/* ─────────────────────────────────────────
+   MARQUEE TEXT ANIMATION
+───────────────────────────────────────── */
+
+.marquee-container {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee-scroll 12s linear infinite;
+}
+
+.marquee-content-artist {
+  display: inline-block;
+  animation: marquee-scroll 8s linear infinite;
+}
+
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ─────────────────────────────────────────
+   SLIM MODERN SCROLLBAR
+───────────────────────────────────────── */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+/* Webkit (Chrome, Safari, Edge, Opera) */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Corner background fix for overflow areas */
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}

@@ -23,7 +23,9 @@ export default function ThemesView() {
   return (
     <div className="max-w-5xl mx-auto px-4 lg:px-8 pt-6 pb-8">
       <div className="flex items-center gap-3 mb-6">
-        <Palette size={22} className="text-primary" />
+        <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+          <Palette size={22} className="text-primary" />
+        </div>
         <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">Themes</h2>
       </div>
 

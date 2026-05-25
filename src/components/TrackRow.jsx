@@ -1,13 +1,47 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { usePlayer } from "../context/PlayerContext";
 import AlbumArt from "./AlbumArt";
 import { Play, Heart, ListPlus } from "lucide-react";
+
+// ── Custom Hook: Checks if the text is actually showing "..." ──
+function useIsTruncated(ref, deps = []) {
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  useEffect(() => {
+    const checkTruncation = () => {
+      if (ref.current) {
+        const { scrollWidth, clientWidth } = ref.current;
+        setIsTruncated(scrollWidth > clientWidth);
+      }
+    };
+
+    checkTruncation();
+    window.addEventListener("resize", checkTruncation);
+    return () => window.removeEventListener("resize", checkTruncation);
+  }, [ref, ...deps]);
+
+  return isTruncated;
+}
 
 function TrackRow({ track, index, tracks }) {
   const { playTrack, currentTrack, isPlaying, isLiked, toggleLike, isInUserQueue, toggleUserQueue } = usePlayer();
   const active = currentTrack?.id === track.id;
   const inQueue = isInUserQueue(track.id);
   const liked = isLiked(track.id);
+  
+  // Track hover state to enable marquee
+  const [isHovered, setIsHovered] = useState(false);
+  const shouldScroll = active || isHovered;
+  
+  // Mobile character length checks
+  const titleLen = track.name.length;
+  const artistLen = track.artist.length;
+
+  // Desktop DOM measurement checks
+  const desktopTitleRef = useRef(null);
+  const desktopArtistRef = useRef(null);
+  const isDesktopTitleTruncated = useIsTruncated(desktopTitleRef, [track.name, active]);
+  const isDesktopArtistTruncated = useIsTruncated(desktopArtistRef, [track.artist, active]);
 
   const handleClick = () => {
     if (track.audio) playTrack(track, tracks, index);
@@ -16,6 +50,8 @@ function TrackRow({ track, index, tracks }) {
   return (
     <div
       onClick={handleClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={`track-row group flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all ${
         active ? "bg-primary/10 ring-1 ring-primary/20" : "hover:bg-base-content/5"
       }`}
@@ -39,8 +75,71 @@ function TrackRow({ track, index, tracks }) {
       />
 
       <div className="min-w-0 flex-1">
-        <p className={`text-sm font-medium truncate ${active ? "text-primary-content" : ""}`}>{track.name}</p>
-        <p className="text-xs text-base-content/50 truncate">{track.artist}</p>
+        {shouldScroll ? (
+          <>
+            {/* ── Mobile Title: Marquee if >= 20 chars ── */}
+            {titleLen >= 15 ? (
+              <div className="marquee-container sm:hidden">
+                <p className={`text-sm font-medium marquee-content ${active ? "text-primary-content" : ""}`}>
+                  <span className="mx-4">{track.name}</span>
+                  <span className="mx-4">{track.name}</span>
+                </p>
+              </div>
+            ) : (
+              <p className={`text-sm font-medium truncate sm:hidden ${active ? "text-primary-content" : ""}`}>{track.name}</p>
+            )}
+            
+            {/* ── Desktop Title: Marquee ONLY if truncated by browser ── */}
+            {isDesktopTitleTruncated ? (
+              <div className="marquee-container hidden sm:block">
+                <p className={`text-sm font-medium marquee-content ${active ? "text-primary-content" : ""}`}>
+                  <span className="mx-4">{track.name}</span>
+                  <span className="mx-4">{track.name}</span>
+                </p>
+              </div>
+            ) : (
+              <p ref={desktopTitleRef} className={`text-sm font-medium truncate hidden sm:block ${active ? "text-primary-content" : ""}`}>{track.name}</p>
+            )}
+          </>
+        ) : (
+          // Default state (not hovered/active)
+          <>
+            <p ref={desktopTitleRef} className={`text-sm font-medium truncate ${active ? "text-primary-content" : ""}`}>{track.name}</p>
+          </>
+        )}
+        
+        {shouldScroll ? (
+          <>
+            {/* ── Mobile Artist: Marquee if >= 15 chars ── */}
+            {artistLen >= 15 ? (
+              <div className="marquee-container sm:hidden">
+                <p className="text-xs text-base-content/50 marquee-content marquee-content-artist">
+                  <span className="mx-4">{track.artist}</span>
+                  <span className="mx-4">{track.artist}</span>
+                </p>
+              </div>
+            ) : (
+              <p className="text-xs text-base-content/50 truncate sm:hidden">{track.artist}</p>
+            )}
+
+            {/* ── Desktop Artist: Marquee ONLY if truncated by browser ── */}
+            {isDesktopArtistTruncated ? (
+              <div className="marquee-container hidden sm:block">
+                <p className="text-xs text-base-content/50 marquee-content marquee-content-artist">
+                  <span className="mx-4">{track.artist}</span>
+                  <span className="mx-4">{track.artist}</span>
+                </p>
+              </div>
+            ) : (
+              <p ref={desktopArtistRef} className="text-xs text-base-content/50 truncate hidden sm:block">{track.artist}</p>
+            )}
+          </>
+        ) : (
+           // Default state (not hovered/active)
+           <>
+             <p ref={desktopArtistRef} className="text-xs text-base-content/50 truncate">{track.artist}</p>
+           </>
+        )}
       </div>
 
       {track.source === "itunes" && (

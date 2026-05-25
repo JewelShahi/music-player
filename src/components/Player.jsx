@@ -29,9 +29,30 @@ const MiniTrackInfo = ({ track, isPlaying }) => (
         src={track.image}
         className={`w-10 h-10 rounded-lg object-cover shrink-0 transition-transform ${isPlaying ? "scale-105" : ""}`}
       />
-      <div className="min-w-0">
-        <p className="text-xs font-semibold truncate">{track.name}</p>
-        <p className="text-[10px] text-base-content/50 truncate">{track.artist}</p>
+      <div className="min-w-0 w-full">
+        {/* Mobile Title: Marquee if >= 20 chars, else truncate */}
+        {track.name.length >= 20 ? (
+          <div className="marquee-container">
+            <p className="text-xs font-semibold marquee-content">
+              <span className="mx-2">{track.name}</span>
+              <span className="mx-2">{track.name}</span>
+            </p>
+          </div>
+        ) : (
+          <p className="text-xs font-semibold truncate">{track.name}</p>
+        )}
+        
+        {/* Mobile Artist: Marquee if >= 20 chars, else truncate */}
+        {track.artist.length >= 20 ? (
+          <div className="marquee-container">
+            <p className="text-[10px] text-base-content/50 marquee-content marquee-content-artist">
+              <span className="mx-2">{track.artist}</span>
+              <span className="mx-2">{track.artist}</span>
+            </p>
+          </div>
+        ) : (
+          <p className="text-[10px] text-base-content/50 truncate">{track.artist}</p>
+        )}
       </div>
     </div>
   ) : (
@@ -77,14 +98,14 @@ export default function Player() {
   const VolIcon = volume === 0 ? VolumeX : volume < 0.4 ? Volume1 : Volume2;
 
   const tabs = [
-    { id: "home",   icon: Home,      label: "Home"   },
-    { id: "queue",  icon: ListMusic, label: "Queue"  },
-    { id: "liked",  icon: Heart,     label: "Liked"  },
-    { id: "themes", icon: Palette,   label: "Themes" },
+    { id: "home", icon: Home, label: "Home" },
+    { id: "queue", icon: ListMusic, label: "Queue" },
+    { id: "liked", icon: Heart, label: "Liked" },
+    { id: "themes", icon: Palette, label: "Themes" },
   ];
 
   const currentSliderVal = isSeeking ? seekVal : (duration > 0 ? (currentTime / duration) * 1000 : 0);
-  const currentPct       = isSeeking ? (seekVal / 1000) * 100 : (duration > 0 ? (currentTime / duration) * 100 : 0);
+  const currentPct = isSeeking ? (seekVal / 1000) * 100 : (duration > 0 ? (currentTime / duration) * 100 : 0);
 
   return (
     <>
@@ -93,7 +114,12 @@ export default function Player() {
         {currentTrack?.image && (
           <div className="np-ambient" style={{ backgroundImage: `url('${currentTrack.image}')` }} />
         )}
-        <div className="absolute inset-0 bg-black/85" />
+
+        {/* Primary Color Tint Layer */}
+        <div className="absolute inset-0 bg-primary/30" />
+
+        {/* Dark Overlay Layer */}
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
         <div className="relative z-10">
           <SeekBar
@@ -108,8 +134,19 @@ export default function Player() {
               {currentTrack ? (
                 <>
                   <AlbumArt src={currentTrack.image} className="w-14 h-14 rounded-lg object-cover shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold truncate">{currentTrack.name}</p>
+                  <div className="min-w-0 w-full">
+                    {/* Desktop Title: Marquee if >= 20 chars, else truncate */}
+                    {currentTrack.name.length >= 20 ? (
+                      <div className="marquee-container">
+                        <p className="text-sm font-semibold marquee-content">
+                          <span className="mx-4">{currentTrack.name}</span>
+                          <span className="mx-4">{currentTrack.name}</span>
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-sm font-semibold truncate">{currentTrack.name}</p>
+                    )}
+                    {/* Desktop Artist: Always static/truncated */}
                     <p className="text-xs text-base-content/50 truncate">{currentTrack.artist}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0 ml-1">
@@ -166,7 +203,12 @@ export default function Player() {
           {currentTrack?.image && (
             <div className="np-ambient" style={{ backgroundImage: `url('${currentTrack.image}')` }} />
           )}
-          <div className="absolute inset-0 bg-black/85" />
+
+          {/* Primary Color Tint Layer */}
+          <div className="absolute inset-0 bg-primary/30" />
+
+          {/* Dark Overlay Layer */}
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
           <div className="relative z-10">
             <SeekBar
@@ -204,9 +246,8 @@ export default function Player() {
               <button
                 key={t.id}
                 onClick={() => setCurrentView(t.id)}
-                className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-colors ${
-                  currentView === t.id ? "text-primary" : "text-base-content/50 hover:text-base-content/70"
-                }`}
+                className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-colors ${currentView === t.id ? "text-primary" : "text-base-content/50 hover:text-base-content/70"
+                  }`}
               >
                 <t.icon size={18} />
                 <span className="text-[9px] font-medium">{t.label}</span>

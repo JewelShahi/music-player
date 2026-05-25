@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useRef, useCallback, useEff
 const Ctx = createContext();
 export const usePlayer = () => useContext(Ctx);
 
-const GENRES = ["All", "Electronic", "Pop", "Rock", "Hip-Hop/Rap", "R&B", "Jazz", "Classical", "Ambient", "Indie", "Metal", "Lo-Fi"];
+const GENRES = ["All", "Electronic", "Phonk", "Pop", "Rock", "Hip-Hop/Rap", "R&B", "Jazz", "Classical", "Ambient", "Indie", "Metal", "Lo-Fi"];
 
 function formatTime(s) {
   if (!isFinite(s) || s < 0) return "0:00";
@@ -20,7 +20,7 @@ export function PlayerProvider({ children }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  
+
   // Load volume from localStorage (fallback to 0.2)
   const [volume, setVolumeRaw] = useState(() => {
     try {
@@ -31,7 +31,7 @@ export function PlayerProvider({ children }) {
 
   const [repeatMode, setRepeatMode] = useState("off");
   const [shuffleOn, setShuffleOn] = useState(false);
-  
+
   // Load userQueue from localStorage
   const [userQueue, setUserQueue] = useState(() => {
     try { return JSON.parse(localStorage.getItem("mp_queue") || "[]"); } catch { return []; }
@@ -41,7 +41,7 @@ export function PlayerProvider({ children }) {
   const [likedMap, setLikedMap] = useState(() => {
     try { return JSON.parse(localStorage.getItem("mp_liked") || "{}"); } catch { return {}; }
   });
-  
+
   // Theme State
   const [theme, setThemeRaw] = useState(() => {
     try { return localStorage.getItem("mp_theme") || "midnight"; } catch { return "midnight"; }
@@ -91,7 +91,7 @@ export function PlayerProvider({ children }) {
   const togglePlay = useCallback(() => {
     const a = audioRef.current;
     if (!a?.src) return;
-    if (a.paused) a.play().then(() => setIsPlaying(true)).catch(() => {});
+    if (a.paused) a.play().then(() => setIsPlaying(true)).catch(() => { });
     else { a.pause(); setIsPlaying(false); }
   }, []);
 
@@ -229,6 +229,11 @@ export function PlayerProvider({ children }) {
     });
   }, []);
 
+  const clearLiked = useCallback(() => {
+    setLikedMap({});
+    localStorage.setItem("mp_liked", "{}");
+  }, []);
+
   const isLiked = useCallback((id) => !!likedMap[id], [likedMap]);
   const likedTracks = Object.values(likedMap);
 
@@ -255,7 +260,7 @@ export function PlayerProvider({ children }) {
     currentView, setCurrentView, showNP, setShowNP,
     likedMap, likedTracks, isLiked, GENRES, formatTime,
     playTrack, togglePlay, playNext, playPrev, seek, setVolume,
-    toggleRepeat, toggleShuffle, toggleLike, 
+    toggleRepeat, toggleShuffle, toggleLike, clearLiked,
     userQueue, isInUserQueue, toggleUserQueue, removeFromUserQueue, clearUserQueue,
     theme, setTheme, seekDragging,
   };

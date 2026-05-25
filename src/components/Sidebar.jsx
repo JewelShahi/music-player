@@ -8,13 +8,13 @@ export default function Sidebar({ initing }) {
 
   const navItems = [
     { id: "home", icon: Home, label: "Home" },
-    { id: "queue", icon: ListMusic, label: "Queue", badge: userQueue.length || null },
-    { id: "liked", icon: Heart, label: "Liked", badge: likedTracks.length || null },
+    { id: "queue", icon: ListMusic, label: "Queue", badge: userQueue?.length || null },
+    { id: "liked", icon: Heart, label: "Liked", badge: likedTracks?.length || null },
     { id: "themes", icon: Palette, label: "Themes" },
   ];
 
   return (
-    <aside className="hidden lg:flex w-60 flex-col bg-base-200 border-r border-base-content/5 shrink-0">
+    <aside className="hidden lg:flex w-60 flex-col bg-primary/10 border-r border-base-content/5 shrink-0">
       {/* Logo */}
       <div className="p-5 flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">

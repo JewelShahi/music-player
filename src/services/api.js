@@ -1,4 +1,4 @@
-const AUDIUS_APP = "MidnightPlayer";
+const AUDIUS_APP = "Audify";
 
 let apiHost = null;
 let apiSource = "none";

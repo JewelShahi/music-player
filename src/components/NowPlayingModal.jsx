@@ -50,6 +50,9 @@ export default function NowPlayingModal() {
   const currentSliderVal = isSeeking ? seekVal : (duration > 0 ? (currentTime / duration) * 1000 : 0);
   const currentPct = isSeeking ? (seekVal / 1000) * 100 : (duration > 0 ? (currentTime / duration) * 100 : 0);
 
+  // Check if the title is long enough to need scrolling
+  const isLongTitle = currentTrack.name.length > 35;
+
   return (
     <div className="fixed inset-0 z-50 animate-slide-up">
       {/* Ambient Background Layer */}
@@ -72,9 +75,25 @@ export default function NowPlayingModal() {
           <AlbumArt src={currentTrack.image} className="w-full h-full object-cover" />
         </div>
 
+        {/* ── Conditional Marquee Title ── */}
         <div className="w-full text-center mb-6">
-          <h3 className="text-xl font-bold truncate text-white">{currentTrack.name}</h3>
-          <p className="text-sm text-white/60 truncate">{currentTrack.artist}</p>
+          {isLongTitle ? (
+            <div className="marquee-container mb-1">
+              <h3 className="text-xl font-bold text-white marquee-content">
+                <span className="mx-8">{currentTrack.name}</span>
+                <span className="mx-8">{currentTrack.name}</span>
+              </h3>
+            </div>
+          ) : (
+            <h3 className="text-xl font-bold text-white truncate mb-1">{currentTrack.name}</h3>
+          )}
+          
+          <div>
+            <p className="text-sm text-white/60">
+              {currentTrack.artist}
+            </p>
+          </div>
+
           {currentTrack.source === "itunes" && (
             <span className="inline-block mt-1 text-[10px] text-error/70 bg-error/10 px-2 py-0.5 rounded-full">30-second preview</span>
           )}
