@@ -5,21 +5,20 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* DaisyUI mapped variables */
         surface: {
-          1: "var(--b1)",
-          2: "var(--b2)",
-          3: "var(--b3)",
-          4: "var(--n)",
+          1: "hsl(var(--b1))",
+          2: "hsl(var(--b2))",
+          3: "hsl(var(--b3))",
+          4: "hsl(var(--n))",
         },
 
         accent: {
-          DEFAULT: "var(--p)",
-          light: "var(--pc)",
-          dark: "var(--pf)",
+          DEFAULT: "hsl(var(--p))",
+          light: "hsl(var(--pc))",
+          dark: "hsl(var(--pf))",
         },
 
-        secondary: "var(--s)",
+        secondary: "hsl(var(--s))",
       },
 
       animation: {
@@ -160,6 +159,105 @@ export default {
           "base-content": "#ebe9ff",
 
           info: "#818cf8",
+          success: "#22c55e",
+          warning: "#f59e0b",
+          error: "#ef4444",
+        },
+      },
+      /* ───────── Sunset ───────── */
+      {
+        sunset: {
+          primary: "#f97316",
+          "primary-content": "#ffffff",
+          "primary-focus": "#ea580c",
+
+          secondary: "#fb923c",
+          accent: "#fdba74",
+
+          neutral: "#1a0e06",
+
+          "base-100": "#0a0500",
+          "base-200": "#120900",
+          "base-300": "#1c0f04",
+
+          "base-content": "#fff0e5",
+
+          info: "#fdba74",
+          success: "#22c55e",
+          warning: "#f59e0b",
+          error: "#ef4444",
+        },
+      },
+
+      /* ───────── Nord ───────── */
+      {
+        nord: {
+          primary: "#3b82f6",
+          "primary-content": "#ffffff",
+          "primary-focus": "#2563eb",
+
+          secondary: "#60a5fa",
+          accent: "#93c5fd",
+
+          neutral: "#080d14",
+
+          "base-100": "#040810",
+          "base-200": "#070d18",
+          "base-300": "#0d1525",
+
+          "base-content": "#e0eeff",
+
+          info: "#38bdf8",
+          success: "#22c55e",
+          warning: "#f59e0b",
+          error: "#ef4444",
+        },
+      },
+
+      /* ───────── Sakura ───────── */
+      {
+        sakura: {
+          primary: "#ec4899",
+          "primary-content": "#ffffff",
+          "primary-focus": "#db2777",
+
+          secondary: "#f472b6",
+          accent: "#f9a8d4",
+
+          neutral: "#1a080e",
+
+          "base-100": "#0b0408",
+          "base-200": "#140610",
+          "base-300": "#1e0a18",
+
+          "base-content": "#ffe8f4",
+
+          info: "#f9a8d4",
+          success: "#22c55e",
+          warning: "#f59e0b",
+          error: "#ef4444",
+        },
+      },
+
+      /* ───────── Fuchsia ───────── */
+      {
+        fuchsia: {
+          primary: "#d946ef",
+          "primary-content": "#ffffff",
+          "primary-focus": "#c026d3",
+
+          secondary: "#e879f9",
+          accent: "#f0abfc",
+
+          neutral: "#1a0620",
+
+          "base-100": "#0a0110",
+          "base-200": "#110318",
+          "base-300": "#1a0624",
+
+          "base-content": "#fce7ff",
+
+          info: "#f0abfc",
           success: "#22c55e",
           warning: "#f59e0b",
           error: "#ef4444",

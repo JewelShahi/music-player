@@ -3,8 +3,41 @@ import { usePlayer } from "../context/PlayerContext";
 import {
   Play, Pause, SkipBack, SkipForward, Repeat, Repeat1, Shuffle,
   Volume2, Volume1, VolumeX, Maximize2, Heart, ListPlus,
-  Home, Search, ListMusic, Palette,
+  Home, ListMusic, Palette,
 } from "lucide-react";
+import AlbumArt from "./AlbumArt";
+
+// ── Moved outside — stable identity, no remount on tick ──
+
+const SeekBar = ({ currentSliderVal, currentPct, onStart, onChange, onEnd, className }) => (
+  <input
+    id="seekSlider"
+    type="range" min="0" max="1000"
+    value={currentSliderVal}
+    className={`range seek-filled w-full h-1 cursor-pointer rounded-none ${className || ""}`}
+    style={{ "--val": `${currentPct}%` }}
+    onMouseDown={onStart} onTouchStart={onStart}
+    onChange={onChange}
+    onMouseUp={onEnd} onTouchEnd={onEnd}
+  />
+);
+
+const MiniTrackInfo = ({ track, isPlaying }) => (
+  track ? (
+    <div className="flex items-center gap-2 min-w-0 flex-1">
+      <AlbumArt
+        src={track.image}
+        className={`w-10 h-10 rounded-lg object-cover shrink-0 transition-transform ${isPlaying ? "scale-105" : ""}`}
+      />
+      <div className="min-w-0">
+        <p className="text-xs font-semibold truncate">{track.name}</p>
+        <p className="text-[10px] text-base-content/50 truncate">{track.artist}</p>
+      </div>
+    </div>
+  ) : (
+    <div className="flex-1 text-xs text-base-content/60 text-center">Pick a song</div>
+  )
+);
 
 export default function Player() {
   const {
@@ -17,22 +50,15 @@ export default function Player() {
 
   const [isSeeking, setIsSeeking] = useState(false);
   const [seekVal, setSeekVal] = useState(0);
-
   const [isVolDragging, setIsVolDragging] = useState(false);
   const [volVal, setVolVal] = useState(volume);
 
-  const handleSeekStart = () => { 
-    seekDragging.current = true; 
-    setIsSeeking(true); 
-  };
-
+  const handleSeekStart = () => { seekDragging.current = true; setIsSeeking(true); };
   const handleSeekChange = (e) => {
     const val = e.target.value;
     setSeekVal(val);
-    const pct = val / 1000;
-    e.target.style.setProperty("--val", (pct * 100) + "%");
+    e.target.style.setProperty("--val", (val / 10) + "%");
   };
-
   const handleSeekEnd = (e) => {
     seekDragging.current = false;
     setIsSeeking(false);
@@ -40,90 +66,48 @@ export default function Player() {
   };
 
   const handleVolStart = () => setIsVolDragging(true);
-
   const handleVolChange = (e) => {
     const val = parseFloat(e.target.value);
     setVolVal(val);
     setVolume(val);
     e.target.style.setProperty("--val", (val * 100) + "%");
   };
-
   const handleVolEnd = () => setIsVolDragging(false);
 
   const VolIcon = volume === 0 ? VolumeX : volume < 0.4 ? Volume1 : Volume2;
 
   const tabs = [
-    { id: "home", icon: Home, label: "Home" },
-    { id: "search", icon: Search, label: "Search" },
-    { id: "queue", icon: ListMusic, label: "Queue" },
-    { id: "liked", icon: Heart, label: "Liked" },
-    { id: "themes", icon: Palette, label: "Themes" },
+    { id: "home",   icon: Home,      label: "Home"   },
+    { id: "queue",  icon: ListMusic, label: "Queue"  },
+    { id: "liked",  icon: Heart,     label: "Liked"  },
+    { id: "themes", icon: Palette,   label: "Themes" },
   ];
 
   const currentSliderVal = isSeeking ? seekVal : (duration > 0 ? (currentTime / duration) * 1000 : 0);
-  const currentPct = isSeeking ? (seekVal / 1000) * 100 : (duration > 0 ? (currentTime / duration) * 100 : 0);
-
-  const SeekBar = ({ className }) => (
-    <input
-      id="seekSlider"
-      type="range" min="0" max="1000" 
-      value={currentSliderVal}
-      className={`range seek-filled w-full h-1 cursor-pointer rounded-none ${className || ""}`}
-      style={{ "--val": `${currentPct}%` }}
-      onMouseDown={handleSeekStart} onTouchStart={handleSeekStart}
-      onChange={handleSeekChange}
-      onMouseUp={handleSeekEnd} onTouchEnd={handleSeekEnd}
-    />
-  );
-
-  const MiniTrackInfo = () => (
-    currentTrack ? (
-      <div className="flex items-center gap-2 min-w-0 flex-1">
-        <img
-          src={currentTrack.image || ""}
-          alt=""
-          className={`w-10 h-10 rounded-lg object-cover bg-base-300 shrink-0 transition-transform ${isPlaying ? "scale-105" : ""}`}
-          onError={(e) => { e.target.src = ""; }}
-        />
-        <div className="min-w-0">
-          <p className="text-xs font-semibold truncate">{currentTrack.name}</p>
-          <p className="text-[10px] text-base-content/50 truncate">{currentTrack.artist}</p>
-        </div>
-      </div>
-    ) : (
-      <div className="flex-1 text-xs text-base-content/60 text-center">Pick a song</div>
-    )
-  );
+  const currentPct       = isSeeking ? (seekVal / 1000) * 100 : (duration > 0 ? (currentTime / duration) * 100 : 0);
 
   return (
     <>
       {/* ── Desktop Player ─────────────── */}
       <div className="hidden lg:block fixed bottom-0 left-60 right-0 z-40 border-t border-base-content/5 overflow-hidden">
-        
-        {/* Ambient Background Layer */}
         {currentTrack?.image && (
-          <div 
-            className="absolute inset-0 pointer-events-none" 
-            style={{ 
-              backgroundImage: `url(${currentTrack.image})`, 
-              backgroundSize: 'cover', 
-              backgroundPosition: 'center',
-              filter: 'blur(80px) saturate(1.8) brightness(0.2)', 
-              transform: 'scale(1.5)' 
-            }} 
-          />
+          <div className="np-ambient" style={{ backgroundImage: `url('${currentTrack.image}')` }} />
         )}
-        {/* Dark Overlay Layer */}
-        <div className="absolute inset-0 bg-base-200/80 backdrop-blur-xl"></div>
-        
-        {/* Content Layer */}
+        <div className="absolute inset-0 bg-black/85" />
+
         <div className="relative z-10">
-          <SeekBar />
+          <SeekBar
+            currentSliderVal={currentSliderVal}
+            currentPct={currentPct}
+            onStart={handleSeekStart}
+            onChange={handleSeekChange}
+            onEnd={handleSeekEnd}
+          />
           <div className="h-[80px] flex items-center px-5 gap-5">
             <div className="flex items-center gap-3 w-1/4 min-w-0 cursor-pointer" onClick={() => setShowNP(true)}>
               {currentTrack ? (
                 <>
-                  <img src={currentTrack.image || ""} alt="" className="w-14 h-14 rounded-lg object-cover bg-base-300 shrink-0" onError={(e) => { e.target.src = ""; }} />
+                  <AlbumArt src={currentTrack.image} className="w-14 h-14 rounded-lg object-cover shrink-0" />
                   <div className="min-w-0">
                     <p className="text-sm font-semibold truncate">{currentTrack.name}</p>
                     <p className="text-xs text-base-content/50 truncate">{currentTrack.artist}</p>
@@ -154,18 +138,18 @@ export default function Player() {
               </div>
               <div className="flex items-center gap-3 w-full max-w-md text-[10px] text-base-content/50 font-mono">
                 <span className="w-8 text-right">{formatTime(currentTime)}</span>
-                <span className="flex-1"></span>
+                <span className="flex-1" />
                 <span className="w-8">{formatTime(duration)}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-2 w-1/4 justify-end">
               <button onClick={() => setVolume(volume === 0 ? 0.2 : 0)} className="btn btn-ghost btn-xs text-base-content/50"><VolIcon size={16} /></button>
-              <input 
-                type="range" min="0" max="1" step="0.01" 
-                value={isVolDragging ? volVal : volume} 
-                className="range vol-filled w-24" 
-                style={{ "--val": `${(isVolDragging ? volVal : volume) * 100}%` }} 
+              <input
+                type="range" min="0" max="1" step="0.01"
+                value={isVolDragging ? volVal : volume}
+                className="range vol-filled w-24"
+                style={{ "--val": `${(isVolDragging ? volVal : volume) * 100}%` }}
                 onMouseDown={handleVolStart} onTouchStart={handleVolStart}
                 onChange={handleVolChange}
                 onMouseUp={handleVolEnd} onTouchEnd={handleVolEnd}
@@ -178,31 +162,22 @@ export default function Player() {
 
       {/* ── Mobile Player + Tabs ──────── */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col">
-        
-        {/* Mini Player with Ambient BG */}
         <div className="border-t border-base-content/5 overflow-hidden relative">
-          
-          {/* Ambient Background Layer */}
           {currentTrack?.image && (
-            <div 
-              className="absolute inset-0 pointer-events-none" 
-              style={{ 
-                backgroundImage: `url(${currentTrack.image})`, 
-                backgroundSize: 'cover', 
-                backgroundPosition: 'center',
-                filter: 'blur(60px) saturate(1.8) brightness(0.2)', 
-                transform: 'scale(1.5)' 
-              }} 
-            />
+            <div className="np-ambient" style={{ backgroundImage: `url('${currentTrack.image}')` }} />
           )}
-          {/* Dark Overlay Layer */}
-          <div className="absolute inset-0 bg-base-200/80 backdrop-blur-xl"></div>
+          <div className="absolute inset-0 bg-black/85" />
 
-          {/* Content Layer */}
           <div className="relative z-10">
-            <SeekBar />
+            <SeekBar
+              currentSliderVal={currentSliderVal}
+              currentPct={currentPct}
+              onStart={handleSeekStart}
+              onChange={handleSeekChange}
+              onEnd={handleSeekEnd}
+            />
             <div className="flex items-center h-16 px-3 gap-1.5">
-              <MiniTrackInfo />
+              <MiniTrackInfo track={currentTrack} isPlaying={isPlaying} />
               {currentTrack && (
                 <>
                   <button onClick={() => toggleUserQueue(currentTrack)} className="btn btn-ghost btn-xs shrink-0 px-1">
@@ -223,7 +198,6 @@ export default function Player() {
           </div>
         </div>
 
-        {/* Tab Bar */}
         <div className="bg-base-100 border-t border-base-content/5">
           <div className="flex justify-around py-1.5">
             {tabs.map((t) => (

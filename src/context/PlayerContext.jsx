@@ -257,7 +257,7 @@ export function PlayerProvider({ children }) {
     playTrack, togglePlay, playNext, playPrev, seek, setVolume,
     toggleRepeat, toggleShuffle, toggleLike, 
     userQueue, isInUserQueue, toggleUserQueue, removeFromUserQueue, clearUserQueue,
-    theme, setTheme, seekDragging, // Added theme and setTheme here
+    theme, setTheme, seekDragging,
   };
 
   return (

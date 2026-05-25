@@ -1,5 +1,6 @@
 import React from "react";
 import { usePlayer } from "../context/PlayerContext";
+import AlbumArt from "./AlbumArt";
 import { Home, ListMusic, Heart, Music2, Wifi, WifiOff, Palette } from "lucide-react";
 
 export default function Sidebar({ initing }) {
@@ -7,7 +8,7 @@ export default function Sidebar({ initing }) {
 
   const navItems = [
     { id: "home", icon: Home, label: "Home" },
-    { id: "queue", icon: ListMusic, label: "Queue", badge: userQueue.length || null }, 
+    { id: "queue", icon: ListMusic, label: "Queue", badge: userQueue.length || null },
     { id: "liked", icon: Heart, label: "Liked", badge: likedTracks.length || null },
     { id: "themes", icon: Palette, label: "Themes" },
   ];
@@ -31,11 +32,10 @@ export default function Sidebar({ initing }) {
           <button
             key={item.id}
             onClick={() => setCurrentView(item.id)}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-              currentView === item.id
-                ? "bg-primary/15 text-primary-content" 
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${currentView === item.id
+                ? "bg-primary/15 text-primary-content"
                 : "text-base-content/50 hover:text-base-content/70 hover:bg-base-content/5"
-            }`}
+              }`}
           >
             <item.icon size={18} />
             <span>{item.label}</span>
@@ -66,12 +66,7 @@ export default function Sidebar({ initing }) {
       {currentTrack && (
         <div className="p-3 mx-3 mb-3 rounded-xl bg-gradient-to-r from-primary/10 to-secondary/5 border border-primary/10">
           <div className="flex items-center gap-2.5">
-            <img 
-              src={currentTrack.image || ""} 
-              alt="" 
-              className="w-10 h-10 rounded-lg object-cover bg-base-300" 
-              onError={(e) => { e.target.src = ""; e.target.className = "w-10 h-10 rounded-lg bg-base-300 flex items-center justify-center"; }} 
-            />
+            <AlbumArt src={currentTrack.image} className="w-10 h-10 rounded-lg object-cover bg-base-300" />
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold truncate">{currentTrack.name}</p>
               <p className="text-[10px] text-base-content/50 truncate">{currentTrack.artist}</p>

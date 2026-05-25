@@ -72,23 +72,43 @@ export function HomeView() {
           </h2>
         </div>
         <p className="text-sm text-base-content/50 ml-[34px]">
-          {isSearching 
+          {isSearching
             ? `Showing results for "${query.trim()}"`
-            : apiSource === "audius" 
-              ? "Full tracks from independent artists" 
+            : apiSource === "audius"
+              ? "Full tracks from independent artists"
               : "30-second previews from iTunes"
           }
         </p>
       </div>
 
       {/* Search Input */}
-      <div className="relative mb-4">
-        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/50 pointer-events-none" />
+      <div className="relative mb-4 group">
+        <Search
+          size={18}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-primary opacity-80 transition-all duration-300 group-focus-within:opacity-100 group-focus-within:scale-110 pointer-events-none"
+        />
         <input
+          id="search-input"
           value={query}
           onChange={handleQueryChange}
           placeholder="Search artists, tracks, albums..."
-          className="input input-bordered w-full pl-11 bg-base-300 border-base-content/10 focus:border-primary/50 focus:outline-none placeholder:text-base-content/40"
+          className="
+            w-full h-12
+            pl-11 pr-4
+            rounded-2xl
+            text-sm text-base-content
+            placeholder:text-base-content/40
+            bg-primary/20
+            backdrop-blur-xl
+            outline-none
+            border-none
+            [box-shadow:inset_0_0_0_1px_hsl(var(--bc)/0.1),inset_0_1px_0_0_hsl(var(--bc)/0.05)]
+            hover:bg-base-content/8
+            hover:[box-shadow:inset_0_0_0_1px_hsl(var(--bc)/0.2),inset_0_1px_0_0_hsl(var(--bc)/0.05)]
+            focus:bg-primary/40
+            focus:[box-shadow:inset_0_0_0_1.5px_hsl(var(--p)/0.8),0_0_0_3px_hsl(var(--p)/0.15),inset_0_1px_0_0_hsl(var(--bc)/0.05)]
+            transition-[box-shadow,background-color] duration-200 ease-out
+          "
         />
       </div>
 
@@ -98,11 +118,10 @@ export function HomeView() {
           <button
             key={g}
             onClick={() => handleGenre(g)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-              (g === "All" && !genre) || g === genre
-                ? "bg-primary/20 text-primary-content border border-primary/30"
-                : "bg-base-content/5 text-base-content/50 border border-base-content/5 hover:bg-base-content/10 hover:text-base-content/70"
-            }`}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${(g === "All" && !genre) || g === genre
+              ? "bg-primary/20 text-primary-content border border-primary/30"
+              : "bg-base-content/5 text-base-content/50 border border-base-content/5 hover:bg-base-content/10 hover:text-base-content/70"
+              }`}
           >
             {g}
           </button>

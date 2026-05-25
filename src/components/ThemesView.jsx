@@ -7,15 +7,19 @@ const themeData = [
   { id: "crimson", name: "Crimson", desc: "Dark rose & red", colors: ["#e11d48", "#be123c", "#0e0608"] },
   { id: "forest", name: "Forest", desc: "Emerald & dark green", colors: ["#10b981", "#059669", "#060e0a"] },
   { id: "ocean", name: "Ocean", desc: "Mixed blue & teal", colors: ["#14b8a6", "#06b6d4", "#060e11"] },
+  { id: "sunset", name: "Sunset", desc: "Warm amber & orange", colors: ["#f97316", "#ea580c", "#0f0800"] },
+  { id: "nord", name: "Nord", desc: "Cool slate & steel blue", colors: ["#60a5fa", "#3b82f6", "#070c12"] },
+  { id: "sakura", name: "Sakura", desc: "Soft pink & rose", colors: ["#f472b6", "#ec4899", "#0f060b"] },
+  { id: "fuchsia", name: "Fuchsia", desc: "Electric magenta & violet", colors: ["#d946ef", "#c026d3", "#0e020f"] },
 ];
 
 export default function ThemesView() {
   const { theme, setTheme } = usePlayer();
 
   return (
-    <div className="max-w-5xl mx-auto px-4 lg:px-8 pt-6 pb-8">
+    <div className="w-80vh max-w-5xl mx-auto px-4 lg:px-8 pt-6 pb-8">
       <div className="flex items-center gap-3 mb-6">
-        <Palette size={22} className="text-accent" />
+        <Palette size={22} className="text-primary" />
         <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">Themes</h2>
       </div>
 
@@ -26,18 +30,17 @@ export default function ThemesView() {
             <button
               key={t.id}
               onClick={() => setTheme(t.id)}
-              className={`relative group p-4 rounded-2xl border transition-all duration-200 text-left ${
-                isActive 
-                  ? "bg-accent-10 border-accent-40 shadow-lg shadow-accent-10 scale-[1.02]" 
+              className={`relative group p-4 rounded-2xl border transition-all duration-200 text-left ${isActive
+                  ? "bg-accent-10 border-accent-40 shadow-lg shadow-accent-10 scale-[1.02]"
                   : "bg-surface-3 border-white/5 hover:border-white/15 hover:bg-surface-4"
-              }`}
+                }`}
             >
               {isActive && (
                 <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-accent flex items-center justify-center">
                   <Check size={14} className="text-white" strokeWidth={3} />
                 </div>
               )}
-              
+
               <div className="flex items-center gap-2 mb-4">
                 {t.colors.map((color, i) => (
                   <div key={i} className="w-8 h-8 rounded-full border-2 border-black/20 shadow-inner" style={{ backgroundColor: color }} />

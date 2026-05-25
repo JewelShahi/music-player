@@ -14,7 +14,7 @@ function AppInner() {
     initAPI().then((src) => { setApiSource(src); setIniting(false); });
   }, []);
 
-  // Added themes: ThemesView here
+  // Added themes
   const views = { home: HomeView, queue: QueueView, liked: LikedView, themes: ThemesView };
   const View = views[currentView] || HomeView;
 
