@@ -10,30 +10,30 @@ export default function Pagination({ page, setPage, hasMore, total, perPage }) {
       <button
         onClick={() => setPage(Math.max(0, page - 1))}
         disabled={page === 0}
-        className="btn btn-sm btn-ghost text-slate-400 gap-1"
+        className="btn btn-sm btn-ghost text-base-content/50 gap-1"
       >
         <ChevronLeft size={16} /> Prev
       </button>
 
       <div className="flex items-center gap-1">
         {page > 1 && (
-          <button onClick={() => setPage(0)} className="btn btn-xs btn-ghost text-slate-500">1</button>
+          <button onClick={() => setPage(0)} className="btn btn-xs btn-ghost text-base-content/60">1</button>
         )}
-        {page > 2 && <span className="text-slate-600 px-1">…</span>}
+        {page > 2 && <span className="text-base-content/30 px-1">…</span>}
         {page > 0 && (
-          <button onClick={() => setPage(page - 1)} className="btn btn-xs btn-ghost text-slate-400">{page}</button>
+          <button onClick={() => setPage(page - 1)} className="btn btn-xs btn-ghost text-base-content/50">{page}</button>
         )}
-        <button className="btn btn-xs btn-active bg-accent/20 border-accent/30 text-accent-light">{page + 1}</button>
+        <button className="btn btn-xs bg-primary/20 border border-primary/30 text-primary">{page + 1}</button>
         {canNext && (
-          <button onClick={() => setPage(page + 1)} className="btn btn-xs btn-ghost text-slate-400">{page + 2}</button>
+          <button onClick={() => setPage(page + 1)} className="btn btn-xs btn-ghost text-base-content/50">{page + 2}</button>
         )}
-        {canNext && page + 2 < (maxPage ?? 999) && <span className="text-slate-600 px-1">…</span>}
+        {canNext && page + 2 < (maxPage ?? 999) && <span className="text-base-content/30 px-1">…</span>}
       </div>
 
       <button
         onClick={() => setPage(page + 1)}
         disabled={!canNext}
-        className="btn btn-sm btn-ghost text-slate-400 gap-1"
+        className="btn btn-sm btn-ghost text-base-content/50 gap-1"
       >
         Next <ChevronRight size={16} />
       </button>

@@ -82,23 +82,23 @@ export default function Player() {
         <img
           src={currentTrack.image || ""}
           alt=""
-          className={`w-10 h-10 rounded-lg object-cover bg-surface-3 shrink-0 transition-transform ${isPlaying ? "scale-105" : ""}`}
+          className={`w-10 h-10 rounded-lg object-cover bg-base-300 shrink-0 transition-transform ${isPlaying ? "scale-105" : ""}`}
           onError={(e) => { e.target.src = ""; }}
         />
         <div className="min-w-0">
           <p className="text-xs font-semibold truncate">{currentTrack.name}</p>
-          <p className="text-[10px] text-slate-500 truncate">{currentTrack.artist}</p>
+          <p className="text-[10px] text-base-content/50 truncate">{currentTrack.artist}</p>
         </div>
       </div>
     ) : (
-      <div className="flex-1 text-xs text-slate-600 text-center">Pick a song</div>
+      <div className="flex-1 text-xs text-base-content/60 text-center">Pick a song</div>
     )
   );
 
   return (
     <>
       {/* ── Desktop Player ─────────────── */}
-      <div className="hidden lg:block fixed bottom-0 left-60 right-0 z-40 border-t border-white/5 overflow-hidden">
+      <div className="hidden lg:block fixed bottom-0 left-60 right-0 z-40 border-t border-base-content/5 overflow-hidden">
         
         {/* Ambient Background Layer */}
         {currentTrack?.image && (
@@ -114,7 +114,7 @@ export default function Player() {
           />
         )}
         {/* Dark Overlay Layer */}
-        <div className="absolute inset-0 bg-surface-2/80 backdrop-blur-xl"></div>
+        <div className="absolute inset-0 bg-base-200/80 backdrop-blur-xl"></div>
         
         {/* Content Layer */}
         <div className="relative z-10">
@@ -123,36 +123,36 @@ export default function Player() {
             <div className="flex items-center gap-3 w-1/4 min-w-0 cursor-pointer" onClick={() => setShowNP(true)}>
               {currentTrack ? (
                 <>
-                  <img src={currentTrack.image || ""} alt="" className="w-14 h-14 rounded-lg object-cover bg-surface-3 shrink-0" onError={(e) => { e.target.src = ""; }} />
+                  <img src={currentTrack.image || ""} alt="" className="w-14 h-14 rounded-lg object-cover bg-base-300 shrink-0" onError={(e) => { e.target.src = ""; }} />
                   <div className="min-w-0">
                     <p className="text-sm font-semibold truncate">{currentTrack.name}</p>
-                    <p className="text-xs text-slate-500 truncate">{currentTrack.artist}</p>
+                    <p className="text-xs text-base-content/50 truncate">{currentTrack.artist}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0 ml-1">
                     <button onClick={(e) => { e.stopPropagation(); toggleUserQueue(currentTrack); }} title="Add to Queue">
-                      <ListPlus size={16} className={isInUserQueue(currentTrack.id) ? "text-accent" : "text-slate-600 hover:text-accent"} />
+                      <ListPlus size={16} className={isInUserQueue(currentTrack.id) ? "text-primary" : "text-base-content/60 hover:text-primary"} />
                     </button>
                     <button onClick={(e) => { e.stopPropagation(); toggleLike(currentTrack); }}>
-                      <Heart size={16} className={isLiked(currentTrack.id) ? "fill-pink-500 text-pink-500" : "text-slate-600 hover:text-slate-400"} />
+                      <Heart size={16} className={isLiked(currentTrack.id) ? "fill-error text-error" : "text-base-content/60 hover:text-base-content/70"} />
                     </button>
                   </div>
                 </>
-              ) : <p className="text-sm text-slate-600">No track selected</p>}
+              ) : <p className="text-sm text-base-content/60">No track selected</p>}
             </div>
 
             <div className="flex-1 flex flex-col items-center gap-0.5">
               <div className="flex items-center gap-4">
-                <button onClick={toggleShuffle} className={`btn btn-ghost btn-circle btn-xs ${shuffleOn ? "text-accent" : "text-slate-500"}`}><Shuffle size={15} /></button>
-                <button onClick={playPrev} className="btn btn-ghost btn-circle btn-sm text-slate-300 hover:text-white"><SkipBack size={18} fill="currentColor" /></button>
-                <button onClick={togglePlay} className="btn btn-circle btn-md bg-white text-surface-1 hover:bg-slate-200 border-none shadow-lg shadow-white/10">
+                <button onClick={toggleShuffle} className={`btn btn-ghost btn-circle btn-xs ${shuffleOn ? "text-primary" : "text-base-content/50"}`}><Shuffle size={15} /></button>
+                <button onClick={playPrev} className="btn btn-ghost btn-circle btn-sm text-base-content/80 hover:text-base-content"><SkipBack size={18} fill="currentColor" /></button>
+                <button onClick={togglePlay} className="btn btn-circle btn-md bg-primary-content text-primary hover:bg-primary-content/80 border-none shadow-lg shadow-black/20">
                   {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-0.5" />}
                 </button>
-                <button onClick={playNext} className="btn btn-ghost btn-circle btn-sm text-slate-300 hover:text-white"><SkipForward size={18} fill="currentColor" /></button>
-                <button onClick={toggleRepeat} className={`btn btn-ghost btn-circle btn-xs ${repeatMode !== "off" ? "text-accent" : "text-slate-500"}`}>
+                <button onClick={playNext} className="btn btn-ghost btn-circle btn-sm text-base-content/80 hover:text-base-content"><SkipForward size={18} fill="currentColor" /></button>
+                <button onClick={toggleRepeat} className={`btn btn-ghost btn-circle btn-xs ${repeatMode !== "off" ? "text-primary" : "text-base-content/50"}`}>
                   {repeatMode === "one" ? <Repeat1 size={15} /> : <Repeat size={15} />}
                 </button>
               </div>
-              <div className="flex items-center gap-3 w-full max-w-md text-[10px] text-slate-500 font-mono">
+              <div className="flex items-center gap-3 w-full max-w-md text-[10px] text-base-content/50 font-mono">
                 <span className="w-8 text-right">{formatTime(currentTime)}</span>
                 <span className="flex-1"></span>
                 <span className="w-8">{formatTime(duration)}</span>
@@ -160,7 +160,7 @@ export default function Player() {
             </div>
 
             <div className="flex items-center gap-2 w-1/4 justify-end">
-              <button onClick={() => setVolume(volume === 0 ? 0.2 : 0)} className="btn btn-ghost btn-xs text-slate-500"><VolIcon size={16} /></button>
+              <button onClick={() => setVolume(volume === 0 ? 0.2 : 0)} className="btn btn-ghost btn-xs text-base-content/50"><VolIcon size={16} /></button>
               <input 
                 type="range" min="0" max="1" step="0.01" 
                 value={isVolDragging ? volVal : volume} 
@@ -170,7 +170,7 @@ export default function Player() {
                 onChange={handleVolChange}
                 onMouseUp={handleVolEnd} onTouchEnd={handleVolEnd}
               />
-              <button onClick={() => setShowNP(true)} className="btn btn-ghost btn-xs text-slate-500 ml-1"><Maximize2 size={15} /></button>
+              <button onClick={() => setShowNP(true)} className="btn btn-ghost btn-xs text-base-content/50 ml-1"><Maximize2 size={15} /></button>
             </div>
           </div>
         </div>
@@ -180,7 +180,7 @@ export default function Player() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col">
         
         {/* Mini Player with Ambient BG */}
-        <div className="border-t border-white/5 overflow-hidden relative">
+        <div className="border-t border-base-content/5 overflow-hidden relative">
           
           {/* Ambient Background Layer */}
           {currentTrack?.image && (
@@ -196,7 +196,7 @@ export default function Player() {
             />
           )}
           {/* Dark Overlay Layer */}
-          <div className="absolute inset-0 bg-surface-2/80 backdrop-blur-xl"></div>
+          <div className="absolute inset-0 bg-base-200/80 backdrop-blur-xl"></div>
 
           {/* Content Layer */}
           <div className="relative z-10">
@@ -206,32 +206,32 @@ export default function Player() {
               {currentTrack && (
                 <>
                   <button onClick={() => toggleUserQueue(currentTrack)} className="btn btn-ghost btn-xs shrink-0 px-1">
-                    <ListPlus size={15} className={isInUserQueue(currentTrack.id) ? "text-accent" : "text-slate-500"} />
+                    <ListPlus size={15} className={isInUserQueue(currentTrack.id) ? "text-primary" : "text-base-content/50"} />
                   </button>
                   <button onClick={() => toggleLike(currentTrack)} className="btn btn-ghost btn-xs shrink-0 px-1">
-                    <Heart size={15} className={isLiked(currentTrack.id) ? "fill-pink-500 text-pink-500" : "text-slate-500"} />
+                    <Heart size={15} className={isLiked(currentTrack.id) ? "fill-error text-error" : "text-base-content/50"} />
                   </button>
                 </>
               )}
-              <button onClick={playPrev} className="btn btn-ghost btn-xs text-slate-300 shrink-0 px-1"><SkipBack size={18} fill="currentColor" /></button>
-              <button onClick={togglePlay} className="btn btn-circle btn-sm bg-white text-surface-1 border-none shrink-0 shadow-md">
+              <button onClick={playPrev} className="btn btn-ghost btn-xs text-base-content/80 shrink-0 px-1"><SkipBack size={18} fill="currentColor" /></button>
+              <button onClick={togglePlay} className="btn btn-circle btn-sm bg-primary-content text-primary border-none shrink-0 shadow-md">
                 {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
               </button>
-              <button onClick={playNext} className="btn btn-ghost btn-xs text-slate-300 shrink-0 px-1"><SkipForward size={18} fill="currentColor" /></button>
-              <button onClick={() => setShowNP(true)} className="btn btn-ghost btn-xs text-slate-500 shrink-0 px-1"><Maximize2 size={16} /></button>
+              <button onClick={playNext} className="btn btn-ghost btn-xs text-base-content/80 shrink-0 px-1"><SkipForward size={18} fill="currentColor" /></button>
+              <button onClick={() => setShowNP(true)} className="btn btn-ghost btn-xs text-base-content/50 shrink-0 px-1"><Maximize2 size={16} /></button>
             </div>
           </div>
         </div>
 
-        {/* Tab Bar (No ambient BG needed here, just base) */}
-        <div className="bg-surface-1 border-t border-white/5">
+        {/* Tab Bar */}
+        <div className="bg-base-100 border-t border-base-content/5">
           <div className="flex justify-around py-1.5">
             {tabs.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setCurrentView(t.id)}
                 className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-colors ${
-                  currentView === t.id ? "text-accent" : "text-slate-500 hover:text-slate-300"
+                  currentView === t.id ? "text-primary" : "text-base-content/50 hover:text-base-content/70"
                 }`}
               >
                 <t.icon size={18} />

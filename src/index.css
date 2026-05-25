@@ -2,105 +2,263 @@
 @tailwind components;
 @tailwind utilities;
 
-* { font-family: "Inter", sans-serif; box-sizing: border-box; }
-body { margin: 0; overflow: hidden; }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,.08); border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.14); }
-
-/* ── Range Inputs (Seek & Volume) ── */
-input[type="range"] {
-  -webkit-appearance: none; appearance: none;
-  background: transparent; cursor: pointer;
+* {
+  font-family: "Inter", sans-serif;
+  box-sizing: border-box;
 }
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+/* ───────────────── Scrollbar ───────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.08);
+  border-radius: 999px;
+}
+
+/* ───────────────── DaisyUI Theme Variables ───────────────── */
+/* DaisyUI uses HSL values internally, so convert properly */
+
+:root {
+  --accent-color: hsl(var(--p));
+  --accent-focus: hsl(var(--pf));
+  --accent-content: hsl(var(--pc));
+
+  --error-color: hsl(var(--er));
+  --success-color: hsl(var(--su));
+
+  --base-100: hsl(var(--b1));
+  --base-200: hsl(var(--b2));
+  --base-300: hsl(var(--b3));
+
+  --neutral-color: hsl(var(--n));
+}
+
+/* ───────────────── Range Inputs ───────────────── */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
 input[type="range"]::-webkit-slider-runnable-track {
-  height: 4px; border-radius: 999px;
+  height: 4px;
+  border-radius: 999px;
   background: rgba(255,255,255,.1);
 }
+
 input[type="range"]::-moz-range-track {
-  height: 4px; border-radius: 999px;
-  background: rgba(255,255,255,.1); border: none;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.1);
+  border: none;
 }
 
-/* Thumb (Hidden by default, pops out on hover) */
+/* Thumb */
+
 input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 12px; height: 12px;
-  border-radius: 50%; margin-top: -4px;
-  background: #dc2626; /* crimson red */
-  box-shadow: 0 0 8px rgba(220,38,38,0.45);
-  opacity: 0; transition: opacity .15s, transform .15s; transform: scale(0.8);
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-top: -4px;
+
+  background: var(--accent-color);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent-color) 40%, transparent);
+
+  opacity: 0;
+  transform: scale(0.8);
+
+  transition:
+    opacity .15s,
+    transform .15s;
 }
+
 input[type="range"]::-moz-range-thumb {
-  width: 12px; height: 12px; border-radius: 50%;
-  background: #dc2626; /* crimson red */
-  border: none; box-shadow: 0 0 8px rgba(220,38,38,0.45);
-  opacity: 0; transition: opacity .15s, transform .15s; transform: scale(0.8);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+
+  background: var(--accent-color);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent-color) 40%, transparent);
+
+  opacity: 0;
+  transform: scale(0.8);
+
+  transition:
+    opacity .15s,
+    transform .15s;
 }
 
-/* Hover States - Thumb appears and scales up */
-input[type="range"]:hover::-webkit-slider-thumb { opacity: 1; transform: scale(1); }
-input[type="range"]:hover::-moz-range-thumb { opacity: 1; transform: scale(1); }
+input[type="range"]:hover::-webkit-slider-thumb {
+  opacity: 1;
+  transform: scale(1);
+}
 
-/* Seek Bar Fill - Transparent crimson default, solid crimson on hover */
+input[type="range"]:hover::-moz-range-thumb {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ───────────────── Seek Bar ───────────────── */
+
 .seek-filled {
   background: linear-gradient(
     to right,
-    rgba(220,38,38,0.35) var(--val, 0%),
+    color-mix(in srgb, var(--accent-color) 40%, transparent) var(--val, 0%),
     rgba(255,255,255,.1) var(--val, 0%)
   ) !important;
-  transition: background 0.2s;
+
+  transition: background .2s;
 }
+
 .seek-filled:hover {
   background: linear-gradient(
     to right,
-    #dc2626 var(--val, 0%),
+    var(--accent-color) var(--val, 0%),
     rgba(255,255,255,.1) var(--val, 0%)
   ) !important;
 }
 
-/* Volume Bar Fill - Transparent crimson default, solid crimson on hover */
+/* ───────────────── Volume Bar ───────────────── */
+
 .vol-filled {
   background: linear-gradient(
     to right,
-    rgba(220,38,38,0.35) var(--val, 70%),
+    color-mix(in srgb, var(--accent-color) 40%, transparent) var(--val, 70%),
     rgba(255,255,255,.1) var(--val, 70%)
   ) !important;
-  transition: background 0.2s;
+
+  transition: background .2s;
 }
+
 .vol-filled:hover {
   background: linear-gradient(
     to right,
-    #dc2626 var(--val, 70%),
+    var(--accent-color) var(--val, 70%),
     rgba(255,255,255,.1) var(--val, 70%)
   ) !important;
 }
 
-/* Now playing ambient bg */
+/* ───────────────── Ambient Background ───────────────── */
+
 .np-ambient {
-  position: absolute; inset: 0;
-  background-size: cover; background-position: center;
-  filter: blur(80px) saturate(1.8) brightness(.25);
-  transform: scale(1.4); pointer-events: none;
+  position: absolute;
+  inset: 0;
+
+  background-size: cover;
+  background-position: center;
+
+  filter: blur(80px) saturate(2.5) brightness(.5);
+
+  transform: scale(1.4);
+
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Track row hover play */
-.track-row .play-overlay { opacity: 0; transition: opacity .15s; }
-.track-row:hover .play-overlay { opacity: 1; }
-.track-row:hover .track-num { opacity: 0; }
+/* ───────────────── Track Hover ───────────────── */
 
-/* Stagger animation */
-.stagger-item { animation: fadeUp .35s ease both; }
+.track-row .play-overlay {
+  opacity: 0;
+  transition: opacity .15s;
+}
 
+.track-row:hover .play-overlay {
+  opacity: 1;
+}
 
-/* Now playing ambient bg */
-.np-ambient {
-  position: absolute; inset: 0;
-  background-size: cover; background-position: center;
-  /* Increased brightness from .25 to .5 and saturate to 2.5 so colors pop */
-  filter: blur(80px) saturate(2.5) brightness(0.5); 
-  transform: scale(1.4); pointer-events: none;
-  z-index: 0;
+.track-row:hover .track-num {
+  opacity: 0;
+}
+
+.stagger-item {
+  animation: fadeUp .35s ease both;
+}
+
+/* ───────────────── Theme Utility Classes ───────────────── */
+
+.bg-accent-10 {
+  background-color: color-mix(in srgb, var(--accent-color) 10%, transparent);
+}
+
+.bg-accent-15 {
+  background-color: color-mix(in srgb, var(--accent-color) 15%, transparent);
+}
+
+.bg-accent-20 {
+  background-color: color-mix(in srgb, var(--accent-color) 20%, transparent);
+}
+
+.border-accent-10 {
+  border-color: color-mix(in srgb, var(--accent-color) 10%, transparent);
+}
+
+.border-accent-20 {
+  border-color: color-mix(in srgb, var(--accent-color) 20%, transparent);
+}
+
+.border-accent-30 {
+  border-color: color-mix(in srgb, var(--accent-color) 30%, transparent);
+}
+
+.border-accent-40 {
+  border-color: color-mix(in srgb, var(--accent-color) 40%, transparent);
+}
+
+.ring-accent-20 {
+  --tw-ring-color:
+    color-mix(in srgb, var(--accent-color) 20%, transparent);
+}
+
+.shadow-accent-10 {
+  --tw-shadow-color:
+    color-mix(in srgb, var(--accent-color) 10%, transparent);
+}
+
+.shadow-accent-20 {
+  --tw-shadow-color:
+    color-mix(in srgb, var(--accent-color) 20%, transparent);
+}
+
+.from-accent-10 {
+  --tw-gradient-from:
+    color-mix(in srgb, var(--accent-color) 10%, transparent);
+}
+
+.to-accent-5 {
+  --tw-gradient-to:
+    color-mix(in srgb, var(--accent-color) 5%, transparent);
+}
+
+/* Status Colors */
+
+.bg-error-10 {
+  background-color:
+    color-mix(in srgb, var(--error-color) 10%, transparent);
+}
+
+.text-error {
+  color: var(--error-color);
+}
+
+.fill-error {
+  fill: var(--error-color);
+}
+
+.text-success {
+  color: var(--success-color);
 }

@@ -40,11 +40,11 @@ export function SearchView() {
 
       {/* Search input */}
       <form onSubmit={doSearch} className="relative mb-4">
-        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/50 pointer-events-none" />
         <input
           value={query} onChange={(e) => setQuery(e.target.value)}
           placeholder="Search artists, tracks, albums..."
-          className="input input-bordered w-full pl-11 bg-surface-3 border-white/10 focus:border-accent/50 focus:outline-none placeholder:text-slate-600"
+          className="input input-bordered w-full pl-11 bg-base-300 border-base-content/10 focus:border-primary/50 focus:outline-none placeholder:text-base-content/40"
         />
       </form>
 
@@ -56,8 +56,8 @@ export function SearchView() {
             onClick={() => handleGenre(g)}
             className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
               (g === "All" && !genre) || g === genre
-                ? "bg-accent/20 text-accent-light border border-accent/30"
-                : "bg-white/5 text-slate-500 border border-white/5 hover:bg-white/8 hover:text-slate-300"
+                ? "bg-primary/20 text-primary-content border border-primary/30"
+                : "bg-base-content/5 text-base-content/50 border border-base-content/5 hover:bg-base-content/10 hover:text-base-content/70"
             }`}
           >
             {g}
@@ -67,15 +67,15 @@ export function SearchView() {
 
       {/* Results */}
       {loading ? (
-        <div className="flex justify-center py-20"><span className="loading loading-spinner loading-lg text-accent"></span></div>
+        <div className="flex justify-center py-20"><span className="loading loading-spinner loading-lg text-primary"></span></div>
       ) : searched ? (
         tracks.length > 0 ? (
           <>
             <div className="flex gap-2 mb-4">
-              <button onClick={() => playAll(false)} className="btn btn-sm bg-accent hover:bg-accent-dark border-none text-white gap-1.5">
+              <button onClick={() => playAll(false)} className="btn btn-sm bg-primary hover:bg-primary-focus border-none text-primary-content gap-1.5">
                 <Play size={14} fill="currentColor" /> Play All
               </button>
-              <button onClick={() => playAll(true)} className="btn btn-sm btn-ghost text-slate-400 gap-1.5">
+              <button onClick={() => playAll(true)} className="btn btn-sm btn-ghost text-base-content/50 gap-1.5">
                 <Shuffle size={14} /> Shuffle
               </button>
             </div>
@@ -85,10 +85,10 @@ export function SearchView() {
             <Pagination page={page} setPage={setPage} hasMore={tracks.length === PER_PAGE} total={null} perPage={PER_PAGE} />
           </>
         ) : (
-          <div className="text-center py-20 text-slate-500">No results found. Try different keywords.</div>
+          <div className="text-center py-20 text-base-content/50">No results found. Try different keywords.</div>
         )
       ) : (
-        <div className="text-center py-20 text-slate-600">Type something to search for music</div>
+        <div className="text-center py-20 text-base-content/60">Type something to search for music</div>
       )}
     </div>
   );

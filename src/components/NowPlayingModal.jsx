@@ -56,14 +56,14 @@ export default function NowPlayingModal() {
         <div className="np-ambient" style={{ backgroundImage: `url(${currentTrack.image})` }} />
       )}
       
-      {/* FIX: Semi-transparent dark overlay so the album colors bleed through */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-xl" />
+      {/* Semi-transparent base overlay so the album colors bleed through */}
+      <div className="absolute inset-0 bg-base-100/80 backdrop-blur-xl" />
 
       <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 max-w-lg mx-auto">
-        <button onClick={() => setShowNP(false)} className="absolute top-4 left-4 btn btn-ghost btn-circle btn-sm text-white/70 hover:text-white">
+        <button onClick={() => setShowNP(false)} className="absolute top-4 left-4 btn btn-ghost btn-circle btn-sm text-primary-content/70 hover:text-primary-content">
           <ChevronDown size={22} />
         </button>
-        <button onClick={() => { setShowNP(false); setCurrentView("queue"); }} className="absolute top-4 right-4 btn btn-ghost btn-circle btn-sm text-white/70 hover:text-white">
+        <button onClick={() => { setShowNP(false); setCurrentView("queue"); }} className="absolute top-4 right-4 btn btn-ghost btn-circle btn-sm text-primary-content/70 hover:text-primary-content">
           <ListMusic size={18} />
         </button>
 
@@ -71,20 +71,20 @@ export default function NowPlayingModal() {
           {currentTrack.image ? (
             <img src={currentTrack.image} alt="" className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full bg-surface-3 flex items-center justify-center text-5xl text-slate-700">♪</div>
+            <div className="w-full h-full bg-base-300 flex items-center justify-center text-5xl text-base-content/30">♪</div>
           )}
         </div>
 
         <div className="w-full text-center mb-6">
-          <h3 className="text-xl font-bold truncate text-white">{currentTrack.name}</h3>
-          <p className="text-sm text-white/60 truncate">{currentTrack.artist}</p>
+          <h3 className="text-xl font-bold truncate text-primary-content">{currentTrack.name}</h3>
+          <p className="text-sm text-primary-content/60 truncate">{currentTrack.artist}</p>
           {currentTrack.source === "itunes" && (
-            <span className="inline-block mt-1 text-[10px] text-pink-400/70 bg-pink-500/10 px-2 py-0.5 rounded-full">30-second preview</span>
+            <span className="inline-block mt-1 text-[10px] text-error/70 bg-error/10 px-2 py-0.5 rounded-full">30-second preview</span>
           )}
         </div>
 
         <div className="w-full flex items-center gap-3 mb-4">
-          <span className="text-[11px] text-white/50 font-mono w-10 text-right">{formatTime(currentTime)}</span>
+          <span className="text-[11px] text-primary-content/50 font-mono w-10 text-right">{formatTime(currentTime)}</span>
           <input
             type="range" min="0" max="1000"
             value={currentSliderVal}
@@ -94,29 +94,29 @@ export default function NowPlayingModal() {
             onChange={handleSeekChange}
             onMouseUp={handleSeekEnd} onTouchEnd={handleSeekEnd}
           />
-          <span className="text-[11px] text-white/50 font-mono w-10">{formatTime(duration)}</span>
+          <span className="text-[11px] text-primary-content/50 font-mono w-10">{formatTime(duration)}</span>
         </div>
 
         <div className="flex items-center justify-center gap-5 mb-6">
-          <button onClick={toggleShuffle} className={`btn btn-ghost btn-circle btn-sm ${shuffleOn ? "text-white" : "text-white/40 hover:text-white/70"}`}><Shuffle size={18} /></button>
-          <button onClick={playPrev} className="btn btn-ghost btn-circle text-white/80 hover:text-white"><SkipBack size={22} fill="currentColor" /></button>
-          <button onClick={togglePlay} className="btn btn-circle bg-white text-surface-1 hover:bg-slate-200 border-none w-14 h-14 shadow-xl shadow-white/10">
+          <button onClick={toggleShuffle} className={`btn btn-ghost btn-circle btn-sm ${shuffleOn ? "text-primary" : "text-primary-content/40 hover:text-primary-content/70"}`}><Shuffle size={18} /></button>
+          <button onClick={playPrev} className="btn btn-ghost btn-circle text-primary-content/80 hover:text-primary-content"><SkipBack size={22} fill="currentColor" /></button>
+          <button onClick={togglePlay} className="btn btn-circle bg-primary-content text-primary hover:bg-primary-content/80 border-none w-14 h-14 shadow-xl shadow-black/20">
             {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}
           </button>
-          <button onClick={playNext} className="btn btn-ghost btn-circle text-white/80 hover:text-white"><SkipForward size={22} fill="currentColor" /></button>
-          <button onClick={toggleRepeat} className={`btn btn-ghost btn-circle btn-sm ${repeatMode !== "off" ? "text-white" : "text-white/40 hover:text-white/70"}`}>
+          <button onClick={playNext} className="btn btn-ghost btn-circle text-primary-content/80 hover:text-primary-content"><SkipForward size={22} fill="currentColor" /></button>
+          <button onClick={toggleRepeat} className={`btn btn-ghost btn-circle btn-sm ${repeatMode !== "off" ? "text-primary" : "text-primary-content/40 hover:text-primary-content/70"}`}>
             {repeatMode === "one" ? <Repeat1 size={18} /> : <Repeat size={18} />}
           </button>
         </div>
 
         <div className="w-full flex items-center gap-4 max-w-xs">
           <button onClick={() => toggleUserQueue(currentTrack)} title={inQueue ? "Remove from Queue" : "Add to Queue"}>
-            <ListPlus size={20} className={inQueue ? "text-white" : "text-white/40"} />
+            <ListPlus size={20} className={inQueue ? "text-primary" : "text-primary-content/40"} />
           </button>
           <button onClick={() => toggleLike(currentTrack)}>
-            <Heart size={20} className={isLiked(currentTrack.id) ? "fill-pink-500 text-pink-500" : "text-white/40"} />
+            <Heart size={20} className={isLiked(currentTrack.id) ? "fill-error text-error" : "text-primary-content/40"} />
           </button>
-          <button onClick={() => setVolume(volume === 0 ? 0.2 : 0)} className="text-white/40">
+          <button onClick={() => setVolume(volume === 0 ? 0.2 : 0)} className="text-primary-content/40">
             <VolIcon size={18} />
           </button>
           <input

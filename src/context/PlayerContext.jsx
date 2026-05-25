@@ -42,6 +42,21 @@ export function PlayerProvider({ children }) {
     try { return JSON.parse(localStorage.getItem("mp_liked") || "{}"); } catch { return {}; }
   });
   
+  // Theme State
+  const [theme, setThemeRaw] = useState(() => {
+    try { return localStorage.getItem("mp_theme") || "midnight"; } catch { return "midnight"; }
+  });
+
+  const setTheme = useCallback((t) => {
+    setThemeRaw(t);
+    localStorage.setItem("mp_theme", t);
+    document.documentElement.setAttribute("data-theme", t);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
   const [apiSource, setApiSource] = useState("none");
   const [currentView, setCurrentView] = useState("home");
   const [showNP, setShowNP] = useState(false);
@@ -242,7 +257,7 @@ export function PlayerProvider({ children }) {
     playTrack, togglePlay, playNext, playPrev, seek, setVolume,
     toggleRepeat, toggleShuffle, toggleLike, 
     userQueue, isInUserQueue, toggleUserQueue, removeFromUserQueue, clearUserQueue,
-    seekDragging,
+    theme, setTheme, seekDragging, // Added theme and setTheme here
   };
 
   return (
