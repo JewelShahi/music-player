@@ -64,7 +64,7 @@ export function HomeView() {
         </div>
         <div>
           <h1 className="text-sm font-bold tracking-tight leading-tight">Midnight</h1>
-          <p className="text-[10px] text-base-content/50 font-medium">Music Player</p>
+          <p className="text-[10px] text-base-content/50 font-medium">Music Player • Jewel Shahi</p>
         </div>
       </div>
 
