@@ -85,28 +85,30 @@ export function HomeView() {
     <div className="max-w-5xl mx-auto px-4 lg:px-8 pt-6 pb-8">
 
       {/* ── Mobile-only header (hidden on lg where sidebar shows) ── */}
-      <div className="flex lg:hidden items-center justify-center gap-3 mb-8 px-4 py-3 rounded-2xl bg-base-200/60 border border-base-300/40 shadow-sm">
+      <div className="flex lg:hidden items-center justify-center gap-4 mb-8 px-5 py-4 rounded-2xl bg-base-200/60 border border-base-300/40 shadow-sm">
 
-        <div className="w-11 h-11 rounded-2xl bg-primary flex items-center justify-center shadow-md shadow-primary/20">
-          <Music2 size={20} className="text-primary-content" />
+        <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-md shadow-primary/20 shrink-0">
+          <Music2 size={22} className="text-primary-content" />
         </div>
 
-        <div className="flex items-center gap-2 min-w-0">
-          <h1 className="text-base font-semibold tracking-tight whitespace-nowrap">
+        <div className="flex flex-col items-start justify-center leading-tight">
+
+          <h1 className="text-lg font-bold tracking-tight text-base-content">
             Audify
           </h1>
 
-          <span className="text-base-content/30">•</span>
+          <div className="flex flex-wrap items-center gap-1 mt-1">
+            <p className="text-[11px] text-base-content/60">
+              Music Player
+            </p>
 
-          <p className="text-sm text-base-content/60 whitespace-nowrap">
-            Music Player
-          </p>
+            <span className="text-base-content/30 text-[9px]">•</span>
 
-          <span className="text-base-content/30">•</span>
+            <p className="text-[11px] text-base-content/60 break-words">
+              Jewel Shahi
+            </p>
+          </div>
 
-          <p className="text-sm text-base-content/60 truncate max-w-[90px]">
-            Jewel Shahi
-          </p>
         </div>
       </div>
 
