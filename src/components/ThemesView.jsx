@@ -11,6 +11,10 @@ const themeData = [
   { id: "nord", name: "Nord", desc: "Cool slate & steel blue", colors: ["#60a5fa", "#3b82f6", "#070c12"] },
   { id: "sakura", name: "Sakura", desc: "Soft pink & rose", colors: ["#f472b6", "#ec4899", "#0f060b"] },
   { id: "fuchsia", name: "Fuchsia", desc: "Electric magenta & violet", colors: ["#d946ef", "#c026d3", "#0e020f"] },
+  { id: "aurora", name: "Aurora", desc: "Cyan & indigo split", colors: ["#06b6d4", "#818cf8", "#030708"] },
+  { id: "wine", name: "Wine", desc: "Deep burgundy & plum", colors: ["#9f1239", "#7f1d1d", "#080205"] },
+  { id: "cobalt", name: "Cobalt", desc: "Rich cobalt & electric blue", colors: ["#1740cf", "#1e3a8a", "#02040f"] },
+  { id: "infrared", name: "Infrared", desc: "Deep red & hot pink", colors: ["#ff2d55", "#c0152a", "#0f0105"] },
 ];
 
 export default function ThemesView() {
@@ -30,9 +34,17 @@ export default function ThemesView() {
             <button
               key={t.id}
               onClick={() => setTheme(t.id)}
+              style={{
+                backgroundColor: isActive
+                  ? `${t.colors[0]}80`
+                  : `${t.colors[0]}4d`,
+                borderColor: isActive
+                  ? `${t.colors[0]}99`
+                  : "rgba(255,255,255,0.05)",
+              }}
               className={`relative group p-4 rounded-2xl border transition-all duration-200 text-left ${isActive
-                  ? "bg-accent-10 border-accent-40 shadow-lg shadow-accent-10 scale-[1.02]"
-                  : "bg-surface-3 border-white/5 hover:border-white/15 hover:bg-surface-4"
+                ? "shadow-lg scale-[1.02]"
+                : "hover:brightness-125"
                 }`}
             >
               {isActive && (

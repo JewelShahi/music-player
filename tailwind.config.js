@@ -263,6 +263,166 @@ export default {
           error: "#ef4444",
         },
       },
+      
+      /* ───────── Aurora ───────── */
+      {
+        aurora: {
+          primary: "#06b6d4",
+          "primary-content": "#ffffff",
+          "primary-focus": "#0891b2",
+
+          secondary: "#818cf8",
+          accent: "#34d399",
+
+          neutral: "#060d12",
+
+          "base-100": "#030708",
+          "base-200": "#070e12",
+          "base-300": "#0d1720",
+
+          "base-content": "#d0f5f9",
+
+          info: "#38bdf8",
+          success: "#22c55e",
+          warning: "#f59e0b",
+          error: "#ef4444",
+        },
+      },
+
+      /* ───────── Ember ───────── */
+      {
+        ember: {
+          primary: "#eab308",
+          "primary-content": "#000000",
+          "primary-focus": "#ca8a04",
+
+          secondary: "#f59e0b",
+          accent: "#fcd34d",
+
+          neutral: "#141006",
+
+          "base-100": "#080600",
+          "base-200": "#100d03",
+          "base-300": "#1a1506",
+
+          "base-content": "#fdf6d3",
+
+          info: "#fcd34d",
+          success: "#22c55e",
+          warning: "#f59e0b",
+          error: "#ef4444",
+        },
+      },
+
+      /* ───────── Slate ───────── */
+      {
+        slate: {
+          primary: "#94a3b8",
+          "primary-content": "#000000",
+          "primary-focus": "#cbd5e1",
+
+          secondary: "#cbd5e1",
+          accent: "#e2e8f0",
+
+          neutral: "#0c0f12",
+
+          "base-100": "#050608",
+          "base-200": "#0a0c10",
+          "base-300": "#101318",
+
+          "base-content": "#e8edf5",
+
+          info: "#7dd3fc",
+          success: "#22c55e",
+          warning: "#f59e0b",
+          error: "#ef4444",
+        },
+      },
+
+      /* ───────── Toxic ───────── */
+      {
+        toxic: {
+          primary: "#84cc16",
+          "primary-content": "#000000",
+          "primary-focus": "#65a30d",
+
+          secondary: "#a3e635",
+          accent: "#d9f99d",
+
+          neutral: "#090f02",
+
+          "base-100": "#040800",
+          "base-200": "#080f02",
+          "base-300": "#0e1804",
+
+          "base-content": "#ecfcd3",
+
+          info: "#d9f99d",
+          success: "#22c55e",
+          warning: "#f59e0b",
+          error: "#ef4444",
+        },
+      },
+
+      /* ───────── Wine ───────── */
+      {
+        wine: {
+          primary: "#9f1239",
+          "primary-content": "#ffffff",
+          "primary-focus": "#881337",
+          secondary: "#be123c",
+          accent: "#fb7185",
+          neutral: "#12040a",
+          "base-100": "#080205",
+          "base-200": "#0f0409",
+          "base-300": "#18060e",
+          "base-content": "#ffe4ec",
+          info: "#fb7185",
+          success: "#22c55e",
+          warning: "#f59e0b",
+          error: "#ef4444",
+        },
+      },
+
+      /* ───────── Cobalt ───────── */
+      {
+        cobalt: {
+          primary: "#1740cf",
+          "primary-content": "#ffffff",
+          "primary-focus": "#1e3a8a",
+          secondary: "#3b5bdb",
+          accent: "#748ffc",
+          neutral: "#02040f",
+          "base-100": "#01020a",
+          "base-200": "#03050f",
+          "base-300": "#060a1a",
+          "base-content": "#dde3ff",
+          info: "#748ffc",
+          success: "#22c55e",
+          warning: "#f59e0b",
+          error: "#ef4444",
+        },
+      },
+
+      /* ───────── Infrared ───────── */
+      {
+        infrared: {
+          primary: "#ff2d55",
+          "primary-content": "#ffffff",
+          "primary-focus": "#c0152a",
+          secondary: "#ff375f",
+          accent: "#ff6b81",
+          neutral: "#0f0105",
+          "base-100": "#090103",
+          "base-200": "#100206",
+          "base-300": "#19030a",
+          "base-content": "#ffe0e6",
+          info: "#ff6b81",
+          success: "#22c55e",
+          warning: "#f59e0b",
+          error: "#ef4444",
+        },
+      },
     ],
   },
 };
