@@ -53,7 +53,7 @@ function TrackRow({ track, index, tracks }) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`track-row group flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all ${
-        active ? "bg-primary/10 ring-1 ring-primary/20" : "hover:bg-base-content/5"
+        active ? "bg-primary/10 ring-1 ring-primary/20" : "hover:bg-primary/5"
       }`}
     >
       <div className="relative w-6 text-center shrink-0">
