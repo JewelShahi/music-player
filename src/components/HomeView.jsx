@@ -85,31 +85,36 @@ export function HomeView() {
     <div className="max-w-5xl mx-auto px-4 lg:px-8 pt-6 pb-8">
 
       {/* ── Mobile-only header (hidden on lg where sidebar shows) ── */}
-      <div className="flex lg:hidden items-center justify-center gap-4 mb-8 px-5 py-4 rounded-2xl bg-base-200/60 border border-base-300/40 shadow-sm">
+      <div className="flex lg:hidden flex-col items-center justify-center gap-3 mb-8 px-5 py-4 rounded-2xl bg-base-200/60 border border-base-300/40 shadow-sm">
 
-        <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-md shadow-primary/20 shrink-0">
-          <Music2 size={22} className="text-primary-content" />
-        </div>
+        {/* Top row: icon + app name */}
+        <div className="flex items-center gap-3">
 
-        <div className="flex flex-col items-start justify-center leading-tight">
+          <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-md shadow-primary/20 shrink-0">
+            <Music2 size={22} className="text-primary-content" />
+          </div>
 
           <h1 className="text-lg font-bold tracking-tight text-base-content">
             Audify
           </h1>
 
-          <div className="flex flex-wrap items-center gap-1 mt-1">
-            <p className="text-[11px] text-base-content/60">
-              Music Player
-            </p>
+        </div>
 
-            <span className="text-base-content/30 text-[9px]">•</span>
+        {/* Bottom row: type + author */}
+        <div className="flex flex-wrap items-center gap-1">
 
-            <p className="text-[11px] text-base-content/60 break-words">
-              Jewel Shahi
-            </p>
-          </div>
+          <p className="text-[11px] text-base-content/60">
+            Music Player
+          </p>
+
+          <span className="text-base-content/30 text-[9px]">•</span>
+
+          <p className="text-[11px] text-base-content/60 break-words">
+            Jewel Shahi
+          </p>
 
         </div>
+
       </div>
 
       {/* ── Hero ── */}
