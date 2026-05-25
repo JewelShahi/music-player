@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { font-family: "Inter", sans-serif; box-sizing: border-box; }
+body { margin: 0; overflow: hidden; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.08); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.14); }
+
+/* ── Range Inputs (Seek & Volume) ── */
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  background: transparent; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 999px;
+  background: rgba(255,255,255,.1);
+}
+input[type="range"]::-moz-range-track {
+  height: 4px; border-radius: 999px;
+  background: rgba(255,255,255,.1); border: none;
+}
+
+/* Thumb (Hidden by default, pops out on hover) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 12px; height: 12px;
+  border-radius: 50%; margin-top: -4px;
+  background: #8b5cf6; box-shadow: 0 0 8px rgba(139,92,246,0.4);
+  opacity: 0; transition: opacity .15s, transform .15s; transform: scale(0.8);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #8b5cf6; border: none; box-shadow: 0 0 8px rgba(139,92,246,0.4);
+  opacity: 0; transition: opacity .15s, transform .15s; transform: scale(0.8);
+}
+
+/* Hover States - Thumb appears and scales up */
+input[type="range"]:hover::-webkit-slider-thumb { opacity: 1; transform: scale(1); }
+input[type="range"]:hover::-moz-range-thumb { opacity: 1; transform: scale(1); }
+
+/* Seek Bar Fill - Transparent purple default, solid purple on hover */
+.seek-filled {
+  background: linear-gradient(to right, rgba(139,92,246,0.35) var(--val, 0%), rgba(255,255,255,.1) var(--val, 0%)) !important;
+  transition: background 0.2s;
+}
+.seek-filled:hover {
+  background: linear-gradient(to right, #8b5cf6 var(--val, 0%), rgba(255,255,255,.1) var(--val, 0%)) !important;
+}
+
+/* Volume Bar Fill - Transparent purple default, solid purple on hover */
+.vol-filled {
+  background: linear-gradient(to right, rgba(139,92,246,0.35) var(--val, 70%), rgba(255,255,255,.1) var(--val, 70%)) !important;
+  transition: background 0.2s;
+}
+.vol-filled:hover {
+  background: linear-gradient(to right, #8b5cf6 var(--val, 70%), rgba(255,255,255,.1) var(--val, 70%)) !important;
+}
+
+/* Now playing ambient bg */
+.np-ambient {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  filter: blur(80px) saturate(1.8) brightness(.25);
+  transform: scale(1.4); pointer-events: none;
+}
+
+/* Track row hover play */
+.track-row .play-overlay { opacity: 0; transition: opacity .15s; }
+.track-row:hover .play-overlay { opacity: 1; }
+.track-row:hover .track-num { opacity: 0; }
+
+/* Stagger animation */
+.stagger-item { animation: fadeUp .35s ease both; }
