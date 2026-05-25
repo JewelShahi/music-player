@@ -1,8 +1,86 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { usePlayer } from "../context/PlayerContext";
 import AlbumArt from "./AlbumArt";
 import { Home, ListMusic, Heart, Music2, Wifi, WifiOff, Palette } from "lucide-react";
 
+// ── Custom Hook: Checks if text is actually truncating ──
+function useIsTruncated(ref, deps = []) {
+  const [isTruncated, setIsTruncated] = useState(false);
+  useEffect(() => {
+    const checkTruncation = () => {
+      if (ref.current) {
+        const { scrollWidth, clientWidth } = ref.current;
+        setIsTruncated(scrollWidth > clientWidth);
+      }
+    };
+    checkTruncation();
+    window.addEventListener("resize", checkTruncation);
+    return () => window.removeEventListener("resize", checkTruncation);
+  }, [ref, ...deps]);
+  return isTruncated;
+}
+
+// ── Mini Now Playing Sub-component ──
+function MiniNowPlaying({ currentTrack, isPlaying }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const shouldScroll = isPlaying || isHovered;
+
+  const titleRef = useRef(null);
+  const artistRef = useRef(null);
+  const isTitleTruncated = useIsTruncated(titleRef, [currentTrack?.name]);
+  const isArtistTruncated = useIsTruncated(artistRef, [currentTrack?.artist]);
+
+  if (!currentTrack) return null;
+
+  return (
+    <div 
+      className="p-3 mx-3 mb-3 rounded-xl bg-gradient-to-r from-primary/10 to-secondary/5 border border-primary/10"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="flex items-center gap-2.5">
+        <AlbumArt src={currentTrack.image} className="w-10 h-10 rounded-lg object-cover bg-base-300 shrink-0" />
+        <div className="min-w-0 flex-1">
+          
+          {/* Title Logic */}
+          {shouldScroll && isTitleTruncated ? (
+            <div className="marquee-container">
+              <p className="text-xs font-semibold marquee-content">
+                <span className="mx-2">{currentTrack.name}</span>
+                <span className="mx-2">{currentTrack.name}</span>
+              </p>
+            </div>
+          ) : (
+            <p ref={titleRef} className="text-xs font-semibold truncate">{currentTrack.name}</p>
+          )}
+
+          {/* Artist Logic */}
+          {shouldScroll && isArtistTruncated ? (
+            <div className="marquee-container">
+              <p className="text-[10px] text-base-content/50 marquee-content marquee-content-artist">
+                <span className="mx-2">{currentTrack.artist}</span>
+                <span className="mx-2">{currentTrack.artist}</span>
+              </p>
+            </div>
+          ) : (
+            <p ref={artistRef} className="text-[10px] text-base-content/50 truncate">{currentTrack.artist}</p>
+          )}
+          
+        </div>
+        {isPlaying && (
+          <div className="flex items-end gap-0.5 h-4 shrink-0">
+            <div className="w-[3px] rounded-full bg-primary animate-eq-1" />
+            <div className="w-[3px] rounded-full bg-primary animate-eq-2" />
+            <div className="w-[3px] rounded-full bg-primary animate-eq-3" />
+            <div className="w-[3px] rounded-full bg-primary animate-eq-4" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Main Sidebar Component ──
 export default function Sidebar({ initing }) {
   const { currentView, setCurrentView, apiSource, userQueue, likedTracks, currentTrack, isPlaying } = usePlayer();
 
@@ -62,26 +140,8 @@ export default function Sidebar({ initing }) {
         </div>
       </div>
 
-      {/* Now playing mini */}
-      {currentTrack && (
-        <div className="p-3 mx-3 mb-3 rounded-xl bg-gradient-to-r from-primary/10 to-secondary/5 border border-primary/10">
-          <div className="flex items-center gap-2.5">
-            <AlbumArt src={currentTrack.image} className="w-10 h-10 rounded-lg object-cover bg-base-300" />
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold truncate">{currentTrack.name}</p>
-              <p className="text-[10px] text-base-content/50 truncate">{currentTrack.artist}</p>
-            </div>
-            {isPlaying && (
-              <div className="flex items-end gap-0.5 h-4">
-                <div className="w-[3px] rounded-full bg-primary animate-eq-1" />
-                <div className="w-[3px] rounded-full bg-primary animate-eq-2" />
-                <div className="w-[3px] rounded-full bg-primary animate-eq-3" />
-                <div className="w-[3px] rounded-full bg-primary animate-eq-4" />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Now playing mini*/}
+      <MiniNowPlaying currentTrack={currentTrack} isPlaying={isPlaying} />
     </aside>
   );
 }
