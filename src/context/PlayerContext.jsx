@@ -20,11 +20,24 @@ export function PlayerProvider({ children }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolumeRaw] = useState(0.7);
+  
+  // Load volume from localStorage (fallback to 0.2)
+  const [volume, setVolumeRaw] = useState(() => {
+    try {
+      const v = localStorage.getItem("mp_volume");
+      return v !== null ? parseFloat(v) : 0.2;
+    } catch { return 0.2; }
+  });
+
   const [repeatMode, setRepeatMode] = useState("off");
   const [shuffleOn, setShuffleOn] = useState(false);
   
-  const [userQueue, setUserQueue] = useState([]);
+  // Load userQueue from localStorage
+  const [userQueue, setUserQueue] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("mp_queue") || "[]"); } catch { return []; }
+  });
+
+  // likedMap already loads from localStorage
   const [likedMap, setLikedMap] = useState(() => {
     try { return JSON.parse(localStorage.getItem("mp_liked") || "{}"); } catch { return {}; }
   });
@@ -36,6 +49,15 @@ export function PlayerProvider({ children }) {
   const skipErrorCount = useRef(0);
 
   const currentTrack = currentIndex >= 0 && currentIndex < queue.length ? queue[currentIndex] : null;
+
+  /* ── Persist to localStorage ──── */
+  useEffect(() => {
+    localStorage.setItem("mp_queue", JSON.stringify(userQueue));
+  }, [userQueue]);
+
+  useEffect(() => {
+    localStorage.setItem("mp_volume", volume.toString());
+  }, [volume]);
 
   /* ── Core playback ─────────────── */
   const playTrack = useCallback((track, newQueue, index) => {
@@ -156,7 +178,8 @@ export function PlayerProvider({ children }) {
     };
   }, [repeatMode, queue, playNext]);
 
-  useEffect(() => { if (audioRef.current) audioRef.current.volume = 0.7; }, []);
+  // Sync initial volume from state to audio element
+  useEffect(() => { if (audioRef.current) audioRef.current.volume = volume; }, []);
 
   useEffect(() => {
     if (!currentTrack || !("mediaSession" in navigator)) return;

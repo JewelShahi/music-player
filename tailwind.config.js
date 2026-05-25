@@ -4,9 +4,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        surface: { 1: "#0c0c16", 2: "#111119", 3: "#1a1a26", 4: "#22222f" },
-        accent: { DEFAULT: "#8b5cf6", light: "#a78bfa", dark: "#6d28d9" },
+        surface: {
+          1: "#0f0a0a",
+          2: "#161010",
+          3: "#211616",
+          4: "#2b1c1c",
+        },
+
+        /* Crimson Theme */
+        accent: {
+          DEFAULT: "#dc2626", // crimson red
+          light: "#ef4444",
+          dark: "#991b1b",
+        },
       },
+
       animation: {
         "eq-1": "eqBounce .6s ease-in-out infinite alternate",
         "eq-2": "eqBounce .6s .15s ease-in-out infinite alternate",
@@ -15,36 +27,65 @@ export default {
         "fade-up": "fadeUp .35s ease both",
         "slide-up": "slideUp .35s cubic-bezier(.4,0,.2,1) both",
       },
+
       keyframes: {
-        eqBounce: { "0%": { height: "3px" }, "100%": { height: "16px" } },
-        fadeUp: { from: { opacity: 0, transform: "translateY(8px)" }, to: { opacity: 1, transform: "translateY(0)" } },
-        slideUp: { from: { transform: "translateY(100%)" }, to: { transform: "translateY(0)" } },
+        eqBounce: {
+          "0%": { height: "3px" },
+          "100%": { height: "16px" },
+        },
+
+        fadeUp: {
+          from: {
+            opacity: 0,
+            transform: "translateY(8px)",
+          },
+          to: {
+            opacity: 1,
+            transform: "translateY(0)",
+          },
+        },
+
+        slideUp: {
+          from: {
+            transform: "translateY(100%)",
+          },
+          to: {
+            transform: "translateY(0)",
+          },
+        },
       },
     },
   },
+
   plugins: [require("daisyui")],
+
   daisyui: {
     themes: [
       {
         crimson: {
-          "primary": "#e11d48",
+          primary: "#dc2626",
           "primary-content": "#ffffff",
-          "primary-focus": "#be123c",
-          "secondary": "#f43f5e",
-          "accent": "#fb7185",
-          "neutral": "#1f0a12",
-          "base-100": "#0e0608",
-          "base-200": "#150a0e",
-          "base-300": "#1f1015",
-          "base-content": "#f1e2e6",
-          "info": "#fb7185",
-          "success": "#34d399",
-          "warning": "#fbbf24",
-          "error": "#ef4444",
+          "primary-focus": "#b91c1c",
+
+          secondary: "#ef4444",
+          accent: "#f87171",
+
+          neutral: "#140909",
+
+          "base-100": "#0b0505",
+          "base-200": "#120808",
+          "base-300": "#1b0d0d",
+
+          "base-content": "#f5e7e7",
+
+          info: "#f87171",
+          success: "#22c55e",
+          warning: "#f59e0b",
+          error: "#ef4444",
         },
       },
-      
     ],
+
     darkTheme: "crimson",
   },
 };

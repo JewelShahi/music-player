@@ -29,12 +29,14 @@ input[type="range"]::-moz-range-track {
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none; width: 12px; height: 12px;
   border-radius: 50%; margin-top: -4px;
-  background: #8b5cf6; box-shadow: 0 0 8px rgba(139,92,246,0.4);
+  background: #dc2626; /* crimson red */
+  box-shadow: 0 0 8px rgba(220,38,38,0.45);
   opacity: 0; transition: opacity .15s, transform .15s; transform: scale(0.8);
 }
 input[type="range"]::-moz-range-thumb {
   width: 12px; height: 12px; border-radius: 50%;
-  background: #8b5cf6; border: none; box-shadow: 0 0 8px rgba(139,92,246,0.4);
+  background: #dc2626; /* crimson red */
+  border: none; box-shadow: 0 0 8px rgba(220,38,38,0.45);
   opacity: 0; transition: opacity .15s, transform .15s; transform: scale(0.8);
 }
 
@@ -42,22 +44,38 @@ input[type="range"]::-moz-range-thumb {
 input[type="range"]:hover::-webkit-slider-thumb { opacity: 1; transform: scale(1); }
 input[type="range"]:hover::-moz-range-thumb { opacity: 1; transform: scale(1); }
 
-/* Seek Bar Fill - Transparent purple default, solid purple on hover */
+/* Seek Bar Fill - Transparent crimson default, solid crimson on hover */
 .seek-filled {
-  background: linear-gradient(to right, rgba(139,92,246,0.35) var(--val, 0%), rgba(255,255,255,.1) var(--val, 0%)) !important;
+  background: linear-gradient(
+    to right,
+    rgba(220,38,38,0.35) var(--val, 0%),
+    rgba(255,255,255,.1) var(--val, 0%)
+  ) !important;
   transition: background 0.2s;
 }
 .seek-filled:hover {
-  background: linear-gradient(to right, #8b5cf6 var(--val, 0%), rgba(255,255,255,.1) var(--val, 0%)) !important;
+  background: linear-gradient(
+    to right,
+    #dc2626 var(--val, 0%),
+    rgba(255,255,255,.1) var(--val, 0%)
+  ) !important;
 }
 
-/* Volume Bar Fill - Transparent purple default, solid purple on hover */
+/* Volume Bar Fill - Transparent crimson default, solid crimson on hover */
 .vol-filled {
-  background: linear-gradient(to right, rgba(139,92,246,0.35) var(--val, 70%), rgba(255,255,255,.1) var(--val, 70%)) !important;
+  background: linear-gradient(
+    to right,
+    rgba(220,38,38,0.35) var(--val, 70%),
+    rgba(255,255,255,.1) var(--val, 70%)
+  ) !important;
   transition: background 0.2s;
 }
 .vol-filled:hover {
-  background: linear-gradient(to right, #8b5cf6 var(--val, 70%), rgba(255,255,255,.1) var(--val, 70%)) !important;
+  background: linear-gradient(
+    to right,
+    #dc2626 var(--val, 70%),
+    rgba(255,255,255,.1) var(--val, 70%)
+  ) !important;
 }
 
 /* Now playing ambient bg */
@@ -75,3 +93,14 @@ input[type="range"]:hover::-moz-range-thumb { opacity: 1; transform: scale(1); }
 
 /* Stagger animation */
 .stagger-item { animation: fadeUp .35s ease both; }
+
+
+/* Now playing ambient bg */
+.np-ambient {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  /* Increased brightness from .25 to .5 and saturate to 2.5 so colors pop */
+  filter: blur(80px) saturate(2.5) brightness(0.5); 
+  transform: scale(1.4); pointer-events: none;
+  z-index: 0;
+}
