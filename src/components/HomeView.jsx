@@ -3,7 +3,7 @@ import { usePlayer } from "../context/PlayerContext";
 import { fetchTrending, searchTracks } from "../services/api";
 import TrackRow from "./TrackRow";
 import Pagination from "./Pagination";
-import { TrendingUp, Shuffle, Play, Search } from "lucide-react";
+import { TrendingUp, Shuffle, Play, Search, Music2 } from "lucide-react";
 
 export function HomeView() {
   const { GENRES, playTrack, apiSource } = usePlayer();
@@ -15,7 +15,6 @@ export function HomeView() {
   const [error, setError] = useState(null);
   const PER_PAGE = 20;
 
-  // Determine if we are in "search mode" or "trending mode"
   const isSearching = query.trim().length > 0;
 
   const load = useCallback(async () => {
@@ -24,10 +23,8 @@ export function HomeView() {
     try {
       let result;
       if (isSearching) {
-        // Search mode
         result = await searchTracks(query.trim(), genre, page, PER_PAGE);
       } else {
-        // Default trending mode
         result = await fetchTrending(genre, page, PER_PAGE);
       }
       setTracks(result.tracks);
@@ -43,12 +40,12 @@ export function HomeView() {
 
   const handleGenre = (g) => {
     setGenre(g === "All" ? "" : g);
-    setPage(0); // Reset page when genre changes
+    setPage(0);
   };
 
   const handleQueryChange = (e) => {
     setQuery(e.target.value);
-    setPage(0); // Reset page when search query changes
+    setPage(0);
   };
 
   const playAll = (shuffle = false) => {
@@ -59,7 +56,19 @@ export function HomeView() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 lg:px-8 pt-6 pb-8">
-      {/* Hero */}
+
+      {/* ── Mobile-only header (hidden on lg where sidebar shows) ── */}
+      <div className="flex lg:hidden items-center gap-3 mb-8">
+        <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
+          <Music2 size={20} className="text-primary-content" />
+        </div>
+        <div>
+          <h1 className="text-sm font-bold tracking-tight leading-tight">Midnight</h1>
+          <p className="text-[10px] text-base-content/50 font-medium">Music Player</p>
+        </div>
+      </div>
+
+      {/* ── Hero ── */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-1">
           {isSearching ? (
@@ -76,12 +85,11 @@ export function HomeView() {
             ? `Showing results for "${query.trim()}"`
             : apiSource === "audius"
               ? "Full tracks from independent artists"
-              : "30-second previews from iTunes"
-          }
+              : "30-second previews from iTunes"}
         </p>
       </div>
 
-      {/* Search Input */}
+      {/* ── Search Input ── */}
       <div className="relative mb-4 group">
         <Search
           size={18}
@@ -112,43 +120,52 @@ export function HomeView() {
         />
       </div>
 
-      {/* Genre chips */}
+      {/* ── Genre chips ── */}
       <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-none mb-4">
         {GENRES.map((g) => (
           <button
             key={g}
             onClick={() => handleGenre(g)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${(g === "All" && !genre) || g === genre
-              ? "bg-primary/20 text-primary-content border border-primary/30"
-              : "bg-base-content/5 text-base-content/50 border border-base-content/5 hover:bg-base-content/10 hover:text-base-content/70"
-              }`}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+              (g === "All" && !genre) || g === genre
+                ? "bg-primary/20 text-primary-content border border-primary/30"
+                : "bg-base-content/5 text-base-content/50 border border-base-content/5 hover:bg-base-content/10 hover:text-base-content/70"
+            }`}
           >
             {g}
           </button>
         ))}
       </div>
 
-      {/* Action buttons (Only show if tracks exist) */}
+      {/* ── Action buttons ── */}
       {tracks.length > 0 && !loading && (
         <div className="flex gap-2 mb-5">
-          <button onClick={() => playAll(false)} className="btn btn-sm bg-primary hover:bg-primary-focus border-none text-primary-content gap-1.5">
+          <button
+            onClick={() => playAll(false)}
+            className="btn btn-sm bg-primary hover:bg-primary-focus border-none text-primary-content gap-1.5"
+          >
             <Play size={14} fill="currentColor" /> Play All
           </button>
-          <button onClick={() => playAll(true)} className="btn btn-sm btn-ghost text-base-content/50 gap-1.5">
+          <button
+            onClick={() => playAll(true)}
+            className="btn btn-sm btn-ghost text-base-content/50 gap-1.5"
+          >
             <Shuffle size={14} /> Shuffle
           </button>
         </div>
       )}
 
-      {/* Tracks & States */}
+      {/* ── Tracks & States ── */}
       {loading ? (
         <div className="flex justify-center py-20">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
+          <span className="loading loading-spinner loading-lg text-primary" />
         </div>
       ) : error ? (
         <div className="text-center py-20">
           <p className="text-base-content/50 mb-3">{error}</p>
-          <button onClick={load} className="btn btn-sm btn-ghost text-primary">Retry</button>
+          <button onClick={load} className="btn btn-sm btn-ghost text-primary">
+            Retry
+          </button>
         </div>
       ) : tracks.length > 0 ? (
         <>
@@ -157,11 +174,19 @@ export function HomeView() {
               <TrackRow key={t.id} track={t} index={i} tracks={tracks} />
             ))}
           </div>
-          <Pagination page={page} setPage={setPage} hasMore={tracks.length === PER_PAGE} total={null} perPage={PER_PAGE} />
+          <Pagination
+            page={page}
+            setPage={setPage}
+            hasMore={tracks.length === PER_PAGE}
+            total={null}
+            perPage={PER_PAGE}
+          />
         </>
       ) : (
         <div className="text-center py-20 text-base-content/50">
-          {isSearching ? "No results found. Try different keywords." : "No trending tracks found for this genre."}
+          {isSearching
+            ? "No results found. Try different keywords."
+            : "No trending tracks found for this genre."}
         </div>
       )}
     </div>
