@@ -194,7 +194,7 @@ export function HomeView() {
         <div className="flex gap-2 mb-5">
           <button
             onClick={() => playAll(false)}
-            className="btn btn-sm bg-primary hover:bg-primary-focus border-none text-primary-content gap-1.5"
+            className="btn btn-sm bg-primary hover:bg-primary/30 border-none text-primary-content gap-1.5"
           >
             <Play size={14} fill="currentColor" /> Play All
           </button>
