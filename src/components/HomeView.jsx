@@ -63,7 +63,7 @@ export function HomeView() {
           <Music2 size={20} className="text-primary-content" />
         </div>
         <div>
-          <h1 className="text-sm font-bold tracking-tight leading-tight">Midnight</h1>
+          <h1 className="text-sm font-bold tracking-tight leading-tight">Audify</h1>
           <p className="text-[10px] text-base-content/50 font-medium">Music Player • Jewel Shahi</p>
         </div>
       </div>
