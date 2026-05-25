@@ -59,7 +59,7 @@ export function QueueView() {
             return (
               <div 
                 key={track.queueId} 
-                className={`group flex items-center rounded-xl transition-all ${isActive ? 'bg-primary/10' : 'hover:bg-base-content/5'}`}
+                className={`group flex items-center rounded-xl transition-all ${isActive ? 'bg-primary/10' : 'hover:bg-primary/5'}`}
               >
                 <div className="flex-1 cursor-pointer min-w-0" onClick={() => playFromQueue(index)}>
                   <div className="flex items-center gap-3 px-2 sm:px-3 py-2.5">
@@ -172,7 +172,7 @@ export function LikedView() {
             return (
               <div 
                 key={track.id} 
-                className={`group flex items-center rounded-xl transition-all ${isActive ? 'bg-primary/10' : 'hover:bg-base-content/5'}`}
+                className={`group flex items-center rounded-xl transition-all ${isActive ? 'bg-primary/10' : 'hover:bg-primary/5'}`}
               >
                 <div className="flex-1 cursor-pointer min-w-0" onClick={() => playFromLiked(index)}>
                   <div className="flex items-center gap-3 px-2 sm:px-3 py-2.5">
