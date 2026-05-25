@@ -21,7 +21,7 @@ export default function ThemesView() {
   const { theme, setTheme } = usePlayer();
 
   return (
-    <div className="w-80vh max-w-5xl mx-auto px-4 lg:px-8 pt-6 pb-8">
+    <div className="max-w-5xl mx-auto px-4 lg:px-8 pt-6 pb-8 min-h-[105vh]">
       <div className="flex items-center gap-3 mb-6">
         <Palette size={22} className="text-primary" />
         <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">Themes</h2>
