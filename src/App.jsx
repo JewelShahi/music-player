@@ -3,7 +3,7 @@ import { PlayerProvider, usePlayer } from "./context/PlayerContext";
 import Sidebar from "./components/Sidebar";
 import Player from "./components/Player";
 import NowPlayingModal from "./components/NowPlayingModal";
-import { HomeView, SearchView, QueueView, LikedView, ThemesView } from "./components/Views"; // Added ThemesView
+import { HomeView, QueueView, LikedView, ThemesView } from "./components/Views";
 import { initAPI } from "./services/api";
 
 function AppInner() {
@@ -15,7 +15,7 @@ function AppInner() {
   }, []);
 
   // Added themes: ThemesView here
-  const views = { home: HomeView, search: SearchView, queue: QueueView, liked: LikedView, themes: ThemesView };
+  const views = { home: HomeView, queue: QueueView, liked: LikedView, themes: ThemesView };
   const View = views[currentView] || HomeView;
 
   return (

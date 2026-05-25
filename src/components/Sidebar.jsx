@@ -1,13 +1,12 @@
 import React from "react";
 import { usePlayer } from "../context/PlayerContext";
-import { Home, Search, ListMusic, Heart, Music2, Wifi, WifiOff, Palette } from "lucide-react";
+import { Home, ListMusic, Heart, Music2, Wifi, WifiOff, Palette } from "lucide-react";
 
 export default function Sidebar({ initing }) {
   const { currentView, setCurrentView, apiSource, userQueue, likedTracks, currentTrack, isPlaying } = usePlayer();
 
   const navItems = [
     { id: "home", icon: Home, label: "Home" },
-    { id: "search", icon: Search, label: "Search" },
     { id: "queue", icon: ListMusic, label: "Queue", badge: userQueue.length || null }, 
     { id: "liked", icon: Heart, label: "Liked", badge: likedTracks.length || null },
     { id: "themes", icon: Palette, label: "Themes" },
