@@ -43,6 +43,11 @@ export function PlayerProvider({ children }) {
     try { return localStorage.getItem("mp_theme") || "midnight"; } catch { return "midnight"; }
   });
 
+  // ─── Last played track (no timestamp, no position) ──────────────────────────
+  const [lastTrack, setLastTrack] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("mp_last_track") || "null"); } catch { return null; }
+  });
+
   const setTheme = useCallback((t) => {
     setThemeRaw(t);
     localStorage.setItem("mp_theme", t);
@@ -65,9 +70,7 @@ export function PlayerProvider({ children }) {
   useEffect(() => { localStorage.setItem("mp_volume", volume.toString()); }, [volume]);
   useEffect(() => { if (audioRef.current) audioRef.current.volume = volume; }, [volume]);
 
-  // ─── FIX 1: Centralised Media Session position sync ─────────────────────────
-  // Always call this instead of writing setPositionState inline.
-  // Passing null (or an invalid duration) resets the OS widget to a blank state.
+  // ─── Centralised Media Session position sync ─────────────────────────────────
   const syncMediaPosition = useCallback((position = 0, forcedDuration) => {
     if (!("mediaSession" in navigator)) return;
     const a = audioRef.current;
@@ -85,8 +88,22 @@ export function PlayerProvider({ children }) {
     } catch (_) { }
   }, []);
 
-  // ─── FIX 2: Shared internal load-and-play helper ─────────────────────────────
-  // Every track change goes through here so the reset logic is never duplicated.
+  // ─── Can next / can prev ──────────────────────────────────────────────────────
+  const canNext = queue.length > 0 && (
+    shuffleOn ||
+    repeatMode === "all" ||
+    repeatMode === "one" ||
+    currentIndex < queue.length - 1
+  );
+
+  const canPrev = queue.length > 0 && (
+    repeatMode === "all" ||
+    repeatMode === "one" ||
+    currentIndex > 0 ||
+    currentTime > 3
+  );
+
+  // ─── Shared internal load-and-play ───────────────────────────────────────────
   const _loadAndPlay = useCallback((track, idx, resolvedQueue) => {
     if (!track?.audio) return;
     skipErrorCount.current = 0;
@@ -96,7 +113,13 @@ export function PlayerProvider({ children }) {
     setCurrentTime(0);
     setDuration(0);
 
-    // Immediately wipe the OS widget so it won't show the previous track's position
+    // Persist last played track (no position saved — intentional)
+    try {
+      localStorage.setItem("mp_last_track", JSON.stringify(track));
+      setLastTrack(track);
+    } catch (_) { }
+
+    // Immediately wipe OS widget so it won't show the previous track's position
     if ("mediaSession" in navigator) {
       try { navigator.mediaSession.setPositionState(null); } catch (_) { }
     }
@@ -109,7 +132,7 @@ export function PlayerProvider({ children }) {
     a.currentTime = 0;
     a.volume = volume;
 
-    // Once metadata is loaded, push 0:00 to the OS widget with the real duration
+    // Push 0:00 with real duration as soon as the browser knows it
     const onMeta = () => {
       if (activeTrackIdRef.current !== track.id) return;
       const d = a.duration;
@@ -124,7 +147,6 @@ export function PlayerProvider({ children }) {
     a.play()
       .then(() => {
         setIsPlaying(true);
-        // Belt-and-suspenders: also sync right after play() resolves
         syncMediaPosition(0, a.duration);
       })
       .catch(() => setIsPlaying(false));
@@ -163,7 +185,6 @@ export function PlayerProvider({ children }) {
 
   const playPrev = useCallback(() => {
     const a = audioRef.current;
-    // If more than 3 s into the track, restart instead of going back
     if (a && a.currentTime > 3) {
       a.currentTime = 0;
       setCurrentTime(0);
@@ -185,7 +206,7 @@ export function PlayerProvider({ children }) {
     syncMediaPosition(time, a.duration);
   }, [syncMediaPosition]);
 
-  // ─── FIX 3: Audio element events — all sync through syncMediaPosition ─────────
+  // ─── Audio element events ─────────────────────────────────────────────────────
   const lastSyncRef = useRef(0);
   useEffect(() => {
     const a = audioRef.current;
@@ -195,7 +216,6 @@ export function PlayerProvider({ children }) {
       if (seekDragging.current) return;
       const ct = a.currentTime;
       setCurrentTime(ct);
-      // Throttle to once per second (was 3 s) to keep the OS bar accurate
       const now = Date.now();
       if (now - lastSyncRef.current > 1000) {
         syncMediaPosition(ct, a.duration);
@@ -219,7 +239,6 @@ export function PlayerProvider({ children }) {
       }
     };
 
-    // FIX: also sync after any seek operation completes
     const onSeeked = () => {
       syncMediaPosition(a.currentTime || 0, a.duration);
     };
@@ -288,9 +307,7 @@ export function PlayerProvider({ children }) {
     };
   }, [repeatMode, queue, playNext, syncMediaPosition]);
 
-  // ─── FIX 4: OS Media Session metadata + explicit play/pause handlers ──────────
-  // Using togglePlay for both "play" and "pause" actions caused weird OS behaviour.
-  // Now each action is explicit.
+  // ─── OS Media Session metadata + explicit play/pause handlers ────────────────
   useEffect(() => {
     if (!currentTrack || !("mediaSession" in navigator)) return;
 
@@ -316,8 +333,9 @@ export function PlayerProvider({ children }) {
       syncMediaPosition(audioRef.current?.currentTime || 0, audioRef.current?.duration);
     });
 
-    navigator.mediaSession.setActionHandler("previoustrack", () => playPrev());
-    navigator.mediaSession.setActionHandler("nexttrack", () => playNext());
+    // Pass null when the action isn't available — this removes the button from the OS widget
+    navigator.mediaSession.setActionHandler("previoustrack", canPrev ? () => playPrev() : null);
+    navigator.mediaSession.setActionHandler("nexttrack", canNext ? () => playNext() : null);
 
     navigator.mediaSession.setActionHandler("seekto", (details) => {
       if (details.seekTime != null) seek(details.seekTime);
@@ -328,7 +346,7 @@ export function PlayerProvider({ children }) {
     navigator.mediaSession.setActionHandler("seekbackward", (details) => {
       seek(Math.max((audioRef.current?.currentTime ?? 0) - (details.seekOffset ?? 10), 0));
     });
-  }, [currentTrack, playPrev, playNext, seek, syncMediaPosition]);
+  }, [currentTrack, canNext, canPrev, playPrev, playNext, seek, syncMediaPosition]);
 
   useEffect(() => {
     if ("mediaSession" in navigator) {
@@ -406,6 +424,9 @@ export function PlayerProvider({ children }) {
     toggleRepeat, toggleShuffle, toggleLike, clearLiked,
     userQueue, isInUserQueue, toggleUserQueue, removeFromUserQueue, clearUserQueue,
     theme, setTheme,
+    lastTrack,
+    canNext,
+    canPrev,
   };
 
   return (
