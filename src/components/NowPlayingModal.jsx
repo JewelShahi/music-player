@@ -116,8 +116,15 @@ export default function NowPlayingModal() {
         <div className="flex items-center justify-center gap-5 mb-6">
           <button onClick={toggleShuffle} className={`btn btn-ghost btn-circle btn-sm ${shuffleOn ? "text-primary" : "text-white/40 hover:text-white/70"}`}><Shuffle size={18} /></button>
           <button onClick={playPrev} className="btn btn-ghost btn-circle text-white/80 hover:text-white"><SkipBack size={22} fill="currentColor" /></button>
-          <button onClick={togglePlay} className="btn btn-circle bg-white text-black hover:bg-white/80 border-none w-14 h-14 shadow-xl shadow-black/20">
-            {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}
+          <button
+            onClick={togglePlay}
+            className="btn btn-circle bg-white text-primary hover:bg-primary hover:text-white border-none w-14 h-14 shadow-xl shadow-black/20"
+          >
+            {isPlaying ? (
+              <Pause size={24} fill="currentColor" />
+            ) : (
+              <Play size={24} fill="currentColor" className="ml-1" />
+            )}
           </button>
           <button onClick={playNext} className="btn btn-ghost btn-circle text-white/80 hover:text-white"><SkipForward size={22} fill="currentColor" /></button>
           <button onClick={toggleRepeat} className={`btn btn-ghost btn-circle btn-sm ${repeatMode !== "off" ? "text-primary" : "text-white/40 hover:text-white/70"}`}>
@@ -130,8 +137,8 @@ export default function NowPlayingModal() {
             onClick={() => toggleUserQueue(currentTrack)}
             title={inQueue ? "Remove from Queue" : "Add to Queue"}
             className={`btn btn-ghost btn-circle btn-sm ${inQueue
-                ? "text-primary"
-                : "text-white/40 hover:text-primary"
+              ? "text-primary"
+              : "text-white/40 hover:text-primary"
               }`}
           >
             <ListPlus size={20} />
