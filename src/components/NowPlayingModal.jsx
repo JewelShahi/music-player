@@ -103,6 +103,7 @@ export default function NowPlayingModal() {
           <span className="text-[11px] text-white/50 font-mono w-10 text-right">{formatTime(currentTime)}</span>
           <input
             type="range" min="0" max="1000"
+            step={1}
             value={currentSliderVal}
             className="range seek-filled flex-1"
             style={{ "--val": `${currentPct}%` }}

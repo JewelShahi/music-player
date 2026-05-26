@@ -13,6 +13,7 @@ const SeekBar = ({ currentSliderVal, currentPct, onStart, onChange, onEnd, class
   <input
     id="seekSlider"
     type="range" min="0" max="1000"
+    step={1}
     value={currentSliderVal}
     className={`range seek-filled w-full h-1 cursor-pointer rounded-none ${className || ""}`}
     style={{ "--val": `${currentPct}%` }}

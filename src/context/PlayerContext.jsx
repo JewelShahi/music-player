@@ -119,8 +119,6 @@ export function PlayerProvider({ children }) {
 
   const playPrev = useCallback(() => {
     const a = audioRef.current;
-    if (a?.currentTime > 3) { a.currentTime = 0; return; }
-    if (!queue.length) return;
     let prevIdx = currentIndex - 1;
     if (prevIdx < 0) prevIdx = repeatMode === "all" ? queue.length - 1 : 0;
     const track = queue[prevIdx];
@@ -236,13 +234,6 @@ export function PlayerProvider({ children }) {
 
   const isLiked = useCallback((id) => !!likedMap[id], [likedMap]);
   const likedTracks = Object.values(likedMap);
-
-  useEffect(() => {
-    if (!seekDragging.current) {
-      const slider = document.getElementById("seekSlider");
-      if (slider && duration > 0) slider.style.setProperty("--val", (currentTime / duration) * 100 + "%");
-    }
-  }, [currentTime, duration]);
 
   useEffect(() => {
     const handler = (e) => {
