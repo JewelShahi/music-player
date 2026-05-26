@@ -65,26 +65,23 @@ export function PlayerProvider({ children }) {
 
   const currentTrack = currentIndex >= 0 && currentIndex < queue.length ? queue[currentIndex] : null;
 
-  /* ── Restore from either last saved or current time ── */
+  /* ── FIX 3: Aggressive restoration with load() and loadedmetadata ── */
   useEffect(() => {
     const lastTrackData = localStorage.getItem("mp_lastTrackData");
     const lastPos = parseFloat(localStorage.getItem("mp_lastPosition") || "0");
-    // Also read the interval‑saved current time (more frequent)
+    // Also check interval-saved position as fallback
     const currentPos = parseFloat(localStorage.getItem("mp_currentTime") || "0");
     const currentTrackId = localStorage.getItem("mp_currentTrackId");
 
-    // Use the more recent position: if currentPos exists and is greater than lastPos, prefer it
     let restorePos = lastPos;
     let restoreTrackData = lastTrackData;
 
-    // If we have a currentTrackId and currentPos, try to find its track data
-    if (currentTrackId && currentPos > 0) {
-      // We need the full track object for that ID. If it's not in mp_lastTrackData, we cannot restore fully.
-      // For simplicity, if mp_lastTrackData matches the ID, use currentPos.
+    // Use currentPos if newer and matches same track
+    if (currentPos > 0 && currentTrackId && lastTrackData) {
       try {
-        const parsed = lastTrackData ? JSON.parse(lastTrackData) : null;
-        if (parsed && parsed.id === currentTrackId) {
-          restorePos = currentPos; // use the more frequent save
+        const track = JSON.parse(lastTrackData);
+        if (track.id === currentTrackId && currentPos > lastPos) {
+          restorePos = currentPos;
         }
       } catch (e) { }
     }
@@ -95,15 +92,31 @@ export function PlayerProvider({ children }) {
         setQueue([track]);
         setCurrentIndex(0);
         const a = audioRef.current;
-        if (a) {
-          a.src = track.audio;
-          a.volume = volume;
-          a.addEventListener("canplay", function onCanPlay() {
+        if (!a) return;
+
+        // Set src and force a full load (clears any browser cached position)
+        a.src = track.audio;
+        a.volume = volume;
+        a.load(); // resets internal media cache
+
+        const setPosition = () => {
+          if (Math.abs(a.currentTime - restorePos) > 0.1) {
             a.currentTime = restorePos;
             setCurrentTime(restorePos);
-            a.removeEventListener("canplay", onCanPlay);
-          }, { once: true });
-        }
+          }
+          a.removeEventListener("loadedmetadata", setPosition);
+        };
+
+        a.addEventListener("loadedmetadata", setPosition, { once: true });
+
+        // If loadedmetadata never fires, try after short delay
+        setTimeout(() => {
+          if (a.currentTime !== restorePos && a.readyState >= 1) {
+            a.currentTime = restorePos;
+            setCurrentTime(restorePos);
+          }
+        }, 500);
+
       } catch (e) { console.warn("Restore failed", e); }
     }
   }, []);
