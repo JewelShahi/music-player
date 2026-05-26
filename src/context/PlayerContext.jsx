@@ -20,7 +20,7 @@ export function PlayerProvider({ children }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  
+
   // Load volume from localStorage (fallback to 0.2)
   const [volume, setVolumeRaw] = useState(() => {
     try {
@@ -31,7 +31,7 @@ export function PlayerProvider({ children }) {
 
   const [repeatMode, setRepeatMode] = useState("off");
   const [shuffleOn, setShuffleOn] = useState(false);
-  
+
   // Load userQueue from localStorage
   const [userQueue, setUserQueue] = useState(() => {
     try { return JSON.parse(localStorage.getItem("mp_queue") || "[]"); } catch { return []; }
@@ -41,7 +41,7 @@ export function PlayerProvider({ children }) {
   const [likedMap, setLikedMap] = useState(() => {
     try { return JSON.parse(localStorage.getItem("mp_liked") || "{}"); } catch { return {}; }
   });
-  
+
   // Theme State
   const [theme, setThemeRaw] = useState(() => {
     try { return localStorage.getItem("mp_theme") || "midnight"; } catch { return "midnight"; }
@@ -83,7 +83,6 @@ export function PlayerProvider({ children }) {
     const a = audioRef.current;
     if (a) {
       a.src = track.audio;
-      a.currentTime = 0;
       a.volume = volume;
       a.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
     }
@@ -112,8 +111,7 @@ export function PlayerProvider({ children }) {
       skipErrorCount.current = 0;
       const a = audioRef.current;
       if (a) {
-        a.src = track.audio; 
-        a.currentTime = 0;
+        a.src = track.audio;
         a.volume = volume;
         a.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
       }
@@ -128,8 +126,7 @@ export function PlayerProvider({ children }) {
       setCurrentIndex(prevIdx);
       const a = audioRef.current;
       if (a) {
-        a.src = track.audio; 
-        a.currentTime = 0;
+        a.src = track.audio;
         a.volume = volume;
         a.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
       }
@@ -226,6 +223,20 @@ export function PlayerProvider({ children }) {
       }
     }, 1000);
     return () => clearInterval(interval);
+  }, [currentTrack]);
+
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a || !currentTrack) return;
+    const savedId = localStorage.getItem("mp_currentTrackId");
+    const savedTime = parseFloat(localStorage.getItem("mp_currentTime") || "0");
+    if (savedId === currentTrack.id && savedTime > 0) {
+      const onCanPlay = () => {
+        a.currentTime = savedTime;
+        a.removeEventListener("canplay", onCanPlay);
+      };
+      a.addEventListener("canplay", onCanPlay);
+    }
   }, [currentTrack]);
 
   const seek = useCallback((time) => {
