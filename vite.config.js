@@ -13,7 +13,7 @@ export default defineConfig({
         name: 'Audify',
         short_name: 'Audify',
         description: 'Music Player',
-        theme_color: '#16161D',
+        theme_color: '#fcfcfc',
         background_color: '#0F0F12',
         display: 'standalone',
         orientation: 'portrait',
