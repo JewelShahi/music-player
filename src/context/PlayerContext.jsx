@@ -497,7 +497,7 @@ export function PlayerProvider({ children }) {
     audioRef, seekDragging,
     queue, setQueue, currentIndex, setCurrentIndex, currentTrack,
     isPlaying, currentTime, duration, volume, status, setStatus,
-    repeatMode, shuffleOn, apiSource, setApiSource,
+    repeatMode, shuffleOn, setShuffleOn, apiSource, setApiSource,
     currentView, setCurrentView, showNP, setShowNP,
     likedMap, likedTracks, isLiked, GENRES, formatTime,
     playTrack, togglePlay, playNext, playPrev, seek, setVolume,

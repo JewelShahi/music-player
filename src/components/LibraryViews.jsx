@@ -221,16 +221,26 @@ function LikedItem({ track, index, isActive, isPlaying, playFromLiked, toggleLik
 // ── Main Views ──
 
 export function QueueView() {
-  const { userQueue, removeFromUserQueue, clearUserQueue, playTrack, isPlaying, currentTrack } = usePlayer();
+  const { userQueue, removeFromUserQueue, clearUserQueue, playTrack, isPlaying, currentTrack, setShuffleOn, shuffleOn } = usePlayer();
 
   const playFromQueue = (index) => {
     if (userQueue[index]?.audio) playTrack(userQueue[index], userQueue, index);
   };
 
   const playAll = (shuffle = false) => {
-    let list = [...userQueue];
-    if (shuffle) list.sort(() => Math.random() - 0.5);
-    if (list.length) playTrack(list[0], list, 0);
+    if (!userQueue.length) return;
+
+    // Tell the global player to turn shuffle ON or OFF
+    setShuffleOn(shuffle);
+
+    if (shuffle) {
+      // Pick a random starting track, but pass the ORIGINAL unshuffled array
+      const randomIndex = Math.floor(Math.random() * userQueue.length);
+      playTrack(userQueue[randomIndex], userQueue, randomIndex);
+    } else {
+      // Start from the first track normally
+      playTrack(userQueue[0], userQueue, 0);
+    }
   };
 
   return (
@@ -248,9 +258,32 @@ export function QueueView() {
         </div>
         {userQueue.length > 0 && (
           <div className="flex gap-2 w-full sm:w-auto">
-            <button onClick={() => playAll(false)} className="btn btn-sm bg-primary hover:bg-primary/30 border-none text-primary-content gap-1.5 flex-1 sm:flex-none"><Play size={14} fill="currentColor" /> Play</button>
-            <button onClick={() => playAll(true)} className="btn btn-sm btn-ghost text-base-content/50 gap-1.5 flex-1 sm:flex-none"><Shuffle size={14} /> Shuffle</button>
-            <button onClick={clearUserQueue} className="btn btn-sm btn-ghost text-error/70 hover:text-error gap-1.5"><Trash2 size={14} /> Clear</button>
+            <button
+              onClick={() => playAll(false)}
+              className={`btn btn-sm gap-1.5 border-none flex-1 sm:flex-none ${!shuffleOn
+                  ? "bg-primary text-primary-content hover:bg-primary/80"
+                  : "btn-ghost text-base-content/50 hover:text-base-content"
+                }`}
+            >
+              <Play size={14} fill="currentColor" /> Play
+            </button>
+
+            <button
+              onClick={() => playAll(true)}
+              className={`btn btn-sm gap-1.5 border-none flex-1 sm:flex-none ${shuffleOn
+                  ? "bg-primary text-primary-content hover:bg-primary/80"
+                  : "btn-ghost text-base-content/50 hover:text-base-content"
+                }`}
+            >
+              <Shuffle size={14} /> Shuffle
+            </button>
+
+            <button
+              onClick={clearUserQueue}
+              className="btn btn-sm btn-ghost text-error/70 hover:text-error gap-1.5"
+            >
+              <Trash2 size={14} /> Clear
+            </button>
           </div>
         )}
       </div>
@@ -281,16 +314,26 @@ export function QueueView() {
 }
 
 export function LikedView() {
-  const { likedTracks, toggleLike, clearLiked, playTrack, isPlaying, currentTrack } = usePlayer();
+  const { likedTracks, toggleLike, clearLiked, playTrack, isPlaying, currentTrack, setShuffleOn, shuffleOn } = usePlayer();
 
   const playFromLiked = (index) => {
     if (likedTracks[index]?.audio) playTrack(likedTracks[index], likedTracks, index);
   };
 
   const playAll = (shuffle = false) => {
-    let list = [...likedTracks];
-    if (shuffle) list.sort(() => Math.random() - 0.5);
-    if (list.length) playTrack(list[0], list, 0);
+    if (!likedTracks.length) return;
+
+    // Tell the global player to turn shuffle ON or OFF
+    setShuffleOn(shuffle);
+
+    if (shuffle) {
+      // Pick a random starting track, but pass the ORIGINAL unshuffled array
+      const randomIndex = Math.floor(Math.random() * likedTracks.length);
+      playTrack(likedTracks[randomIndex], likedTracks, randomIndex);
+    } else {
+      // Start from the first track normally
+      playTrack(likedTracks[0], likedTracks, 0);
+    }
   };
 
   return (
@@ -308,9 +351,32 @@ export function LikedView() {
         </div>
         {likedTracks.length > 0 && (
           <div className="flex gap-2 w-full sm:w-auto">
-            <button onClick={() => playAll(false)} className="btn btn-sm bg-primary hover:bg-primary/30 border-none text-primary-content gap-1.5 flex-1 sm:flex-none"><Play size={14} fill="currentColor" /> Play</button>
-            <button onClick={() => playAll(true)} className="btn btn-sm btn-ghost text-base-content/50 gap-1.5 flex-1 sm:flex-none"><Shuffle size={14} /> Shuffle</button>
-            <button onClick={clearLiked} className="btn btn-sm btn-ghost text-error/70 hover:text-error gap-1.5"><Trash2 size={14} /> Clear</button>
+            <button
+              onClick={() => playAll(false)}
+              className={`btn btn-sm gap-1.5 border-none flex-1 sm:flex-none ${!shuffleOn
+                ? "bg-primary text-primary-content hover:bg-primary/80"
+                : "btn-ghost text-base-content/50 hover:text-base-content"
+                }`}
+            >
+              <Play size={14} fill="currentColor" /> Play
+            </button>
+
+            <button
+              onClick={() => playAll(true)}
+              className={`btn btn-sm gap-1.5 border-none flex-1 sm:flex-none ${shuffleOn
+                ? "bg-primary text-primary-content hover:bg-primary/80"
+                : "btn-ghost text-base-content/50 hover:text-base-content"
+                }`}
+            >
+              <Shuffle size={14} /> Shuffle
+            </button>
+
+            <button
+              onClick={clearLiked}
+              className="btn btn-sm btn-ghost text-error/70 hover:text-error gap-1.5 flex-1 sm:flex-none"
+            >
+              <Trash2 size={14} /> Clear
+            </button>
           </div>
         )}
       </div>

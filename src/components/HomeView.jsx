@@ -6,7 +6,7 @@ import Pagination from "./Pagination";
 import { TrendingUp, Shuffle, Play, Search, Music2 } from "lucide-react";
 
 export function HomeView() {
-  const { GENRES, playTrack, apiSource } = usePlayer();
+  const { GENRES, playTrack, apiSource, setShuffleOn, shuffleOn } = usePlayer();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState(""); // The delayed version
   const [genre, setGenre] = useState("");
@@ -86,9 +86,19 @@ export function HomeView() {
   };
 
   const playAll = (shuffle = false) => {
-    let list = [...tracks];
-    if (shuffle) list.sort(() => Math.random() - 0.5);
-    if (list.length) playTrack(list[0], list, 0);
+    if (!tracks.length) return;
+
+    // Tell the global player to turn shuffle ON or OFF
+    setShuffleOn(shuffle);
+
+    if (shuffle) {
+      // Pick a random starting track, but pass the ORIGINAL unshuffled array
+      const randomIndex = Math.floor(Math.random() * tracks.length);
+      playTrack(tracks[randomIndex], tracks, randomIndex);
+    } else {
+      // Start from the first track normally
+      playTrack(tracks[0], tracks, 0);
+    }
   };
 
   return (
@@ -209,13 +219,20 @@ export function HomeView() {
         <div className="flex gap-2 mb-5">
           <button
             onClick={() => playAll(false)}
-            className="btn btn-sm bg-primary hover:bg-primary/30 border-none text-primary-content gap-1.5"
+            className={`btn btn-sm gap-1.5 border-none ${!shuffleOn
+                ? "bg-primary text-primary-content hover:bg-primary/80"
+                : "btn-ghost text-base-content/50 hover:text-base-content"
+              }`}
           >
             <Play size={14} fill="currentColor" /> Play All
           </button>
+
           <button
             onClick={() => playAll(true)}
-            className="btn btn-sm btn-ghost text-base-content/50 gap-1.5"
+            className={`btn btn-sm gap-1.5 border-none ${shuffleOn
+                ? "bg-primary text-primary-content hover:bg-primary/80"
+                : "btn-ghost text-base-content/50 hover:text-base-content"
+              }`}
           >
             <Shuffle size={14} /> Shuffle
           </button>
