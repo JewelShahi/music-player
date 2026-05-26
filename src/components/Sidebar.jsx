@@ -39,7 +39,7 @@ function MiniNowPlaying({ currentTrack, isPlaying }) {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex items-center gap-2.5">
-        <AlbumArt src={currentTrack.image} className="w-10 h-10 rounded-lg object-cover bg-base-300 shrink-0" />
+        <AlbumArt src={currentTrack.image} className="w-10 h-10 rounded-lg object-cover bg-base-300 shrink-0 shadow-[0_0_20px_rgba(0,0,0,0.6)]" />
         <div className="min-w-0 flex-1">
           
           {/* Title Logic */}

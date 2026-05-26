@@ -56,28 +56,43 @@ function TrackRow({ track, index, tracks }) {
         active ? "bg-primary/10 ring-1 ring-primary/20" : "hover:bg-primary/5"
       }`}
     >
-      <div className="relative w-6 text-center shrink-0">
-        <span className={`track-num text-xs font-mono transition-opacity ${active ? "text-primary" : "text-base-content/60"}`}>
-          {active && isPlaying ? (
-            <span className="flex items-end justify-center gap-0.5 h-4">
-              <span className="w-[3px] rounded-full bg-primary animate-eq-1" />
-              <span className="w-[3px] rounded-full bg-primary animate-eq-2" />
-              <span className="w-[3px] rounded-full bg-primary animate-eq-3" />
+      {/* ── Number / Equalizer / Play Button Logic ── */}
+      <div className="relative w-6 h-4 text-center shrink-0 flex items-center justify-center">
+        {active ? (
+          // If the track is active (playing or paused), show equalizer or play icon.
+          // Hover does nothing here.
+          <span className={`flex items-center justify-center ${active ? "text-primary" : "text-base-content/60"}`}>
+            {isPlaying ? (
+              <span className="flex items-end justify-center gap-0.5 h-4">
+                <span className="w-[3px] rounded-full bg-primary animate-eq-1" />
+                <span className="w-[3px] rounded-full bg-primary animate-eq-2" />
+                <span className="w-[3px] rounded-full bg-primary animate-eq-3" />
+              </span>
+            ) : (
+              <Play size={14} fill="currentColor" />
+            )}
+          </span>
+        ) : (
+          // If the track is NOT active, show the number, 
+          // and on hover, fade out the number and fade in the Play icon.
+          <>
+            <span className="text-xs font-mono text-base-content/60 absolute inset-0 flex items-center justify-center transition-opacity group-hover:opacity-0">
+              {index + 1}
             </span>
-          ) : index + 1}
-        </span>
-        <Play size={14} className="play-overlay absolute inset-0 m-auto text-base-content" fill="currentColor" />
+            <Play size={14} className="absolute inset-0 m-auto text-base-content opacity-0 transition-opacity group-hover:opacity-100" fill="currentColor" />
+          </>
+        )}
       </div>
 
       <AlbumArt
         src={track.image}
-        className={`w-10 h-10 rounded-lg object-cover bg-base-300 shrink-0 ${active ? "ring-1 ring-primary/30" : ""}`}
+        className={`w-11 h-11 rounded-lg object-cover bg-base-300 shadow-[0_0_15px_rgba(0,0,0,0.3)] shrink-0  ${active ? "ring-1 ring-primary/30" : ""}`}
       />
 
       <div className="min-w-0 flex-1">
         {shouldScroll ? (
           <>
-            {/* ── Mobile Title: Marquee if >= 20 chars ── */}
+            {/* ── Mobile Title: Marquee if >= 15 chars ── */}
             {titleLen >= 15 ? (
               <div className="marquee-container sm:hidden">
                 <p className={`text-sm font-medium marquee-content ${active ? "text-primary-content" : ""}`}>

@@ -27,7 +27,7 @@ const MiniTrackInfo = ({ track, isPlaying }) => (
     <div className="flex items-center gap-2 min-w-0 flex-1">
       <AlbumArt
         src={track.image}
-        className={`w-10 h-10 rounded-lg object-cover shrink-0 transition-transform ${isPlaying ? "scale-105" : ""}`}
+        className={`w-10 h-10 rounded-lg object-cover shrink-0 transition-transform shadow-[0_0_15px_rgba(0,0,0,0.3)] ${isPlaying ? "scale-105" : ""}`}
       />
       <div className="min-w-0 w-full">
         {/* Mobile Title: Marquee if >= 20 chars, else truncate */}
@@ -133,7 +133,7 @@ export default function Player() {
             <div className="flex items-center gap-3 w-1/4 min-w-0 cursor-pointer" onClick={() => setShowNP(true)}>
               {currentTrack ? (
                 <>
-                  <AlbumArt src={currentTrack.image} className="w-14 h-14 rounded-lg object-cover shrink-0" />
+                  <AlbumArt src={currentTrack.image} className="w-14 h-14 rounded-lg object-cover shrink-0 shadow-[0_0_15px_rgba(0,0,0,0.3)]" />
                   <div className="min-w-0 w-full">
                     {/* Desktop Title: Marquee if >= 20 chars, else truncate */}
                     {currentTrack.name.length >= 20 ? (

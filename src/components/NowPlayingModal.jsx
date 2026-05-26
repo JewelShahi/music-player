@@ -71,7 +71,7 @@ export default function NowPlayingModal() {
           <ListMusic size={18} />
         </button>
 
-        <div className={`w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 mb-8 ${isPlaying ? "scale-100" : "scale-95"} transition-transform duration-500`}>
+        <div className={`w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-2xl overflow-hidden shadow-[0_0_35px_rgba(0,0,0,0.6)] mb-8 ${isPlaying ? "scale-100" : "scale-95"} transition-transform duration-500`}>
           <AlbumArt src={currentTrack.image} className="w-full h-full object-cover" />
         </div>
 

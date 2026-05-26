@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { usePlayer } from "../context/PlayerContext";
-import AlbumArt from "./AlbumArt"; // <-- ADDED IMPORT
+import AlbumArt from "./AlbumArt";
 import { ListMusic, Heart, Play, Shuffle, X, Trash2, ListPlus } from "lucide-react";
 
 // ── Custom Hook: Checks if text is actually truncating ──
@@ -24,7 +24,7 @@ function useIsTruncated(ref, deps = []) {
 function QueueItem({ track, index, isActive, isPlaying, playFromQueue, removeFromUserQueue }) {
   const [isHovered, setIsHovered] = useState(false);
   const shouldScroll = isActive || isHovered;
-  
+
   const titleLen = track.name.length;
   const artistLen = track.artist.length;
 
@@ -34,29 +34,38 @@ function QueueItem({ track, index, isActive, isPlaying, playFromQueue, removeFro
   const isDesktopArtistTruncated = useIsTruncated(desktopArtistRef, [track.artist, isActive]);
 
   return (
-    <div 
-      className={`group flex items-center rounded-xl transition-all ${isActive ? 'bg-primary/10' : 'hover:bg-primary/5'}`}
+    <div
+      className={`group flex items-center rounded-xl transition-all ${isActive ? 'bg-primary/10 ring-1 ring-primary/20' : 'hover:bg-primary/5'}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex-1 cursor-pointer min-w-0" onClick={() => playFromQueue(index)}>
         <div className="flex items-center gap-3 px-2 sm:px-3 py-2.5">
-          <span className={`hidden sm:flex w-6 justify-center text-xs font-mono ${isActive ? "text-primary" : "text-base-content/40"}`}>
+
+          {/* Number / Equalizer / Play Button Logic */}
+          <span className={`relative hidden sm:flex w-6 h-4 justify-center items-center text-xs font-mono ${isActive ? "text-primary" : "text-base-content/40"}`}>
             {isActive && isPlaying ? (
               <span className="flex items-end justify-center gap-0.5 h-4">
                 <span className="w-[3px] rounded-full bg-primary animate-eq-1" />
                 <span className="w-[3px] rounded-full bg-primary animate-eq-2" />
                 <span className="w-[3px] rounded-full bg-primary animate-eq-3" />
               </span>
-            ) : index + 1}
+            ) : isActive ? (
+              <Play size={14} fill="currentColor" />
+            ) : (
+              <>
+                <span className="transition-opacity group-hover:opacity-0">{index + 1}</span>
+                <Play size={14} className="absolute opacity-0 transition-opacity group-hover:opacity-100" fill="currentColor" />
+              </>
+            )}
           </span>
-          
-          {/* REPLACED IMG WITH ALBUMART */}
-          <AlbumArt 
-            src={track.image} 
-            className="w-11 h-11 rounded-lg object-cover bg-base-300 shrink-0 shadow-md shadow-black/20" 
+
+          {/* Album Art with Active Ring */}
+          <AlbumArt
+            src={track.image}
+            className={`w-11 h-11 rounded-lg object-cover bg-base-300 shrink-0 shadow-[0_0_10px_rgba(0,0,0,0.3)] ${isActive ? "ring-1 ring-primary/30" : ""}`}
           />
-          
+
           <div className="min-w-0 flex-1">
             {shouldScroll ? (
               <>
@@ -98,7 +107,13 @@ function QueueItem({ track, index, isActive, isPlaying, playFromQueue, removeFro
           </div>
         </div>
       </div>
-      <button onClick={() => removeFromUserQueue(track.queueId)} className="btn btn-ghost btn-xs sm:opacity-0 group-hover:sm:opacity-100 text-base-content/40 hover:text-error mr-1 transition-all" title="Remove from Queue"><X size={16} /></button>
+      <button
+        onClick={() => removeFromUserQueue(track.queueId)}
+        className="btn btn-ghost btn-xs sm:opacity-0 group-hover:sm:opacity-100 text-base-content/40 hover:text-error hover:bg-transparent focus:bg-transparent active:bg-transparent shadow-none border-none mr-1 transition-all"
+        title="Remove from Queue"
+      >
+        <X size={16} />
+      </button>
     </div>
   );
 }
@@ -107,7 +122,7 @@ function QueueItem({ track, index, isActive, isPlaying, playFromQueue, removeFro
 function LikedItem({ track, index, isActive, isPlaying, playFromLiked, toggleLike }) {
   const [isHovered, setIsHovered] = useState(false);
   const shouldScroll = isActive || isHovered;
-  
+
   const titleLen = track.name.length;
   const artistLen = track.artist.length;
 
@@ -117,29 +132,38 @@ function LikedItem({ track, index, isActive, isPlaying, playFromLiked, toggleLik
   const isDesktopArtistTruncated = useIsTruncated(desktopArtistRef, [track.artist, isActive]);
 
   return (
-    <div 
-      className={`group flex items-center rounded-xl transition-all ${isActive ? 'bg-primary/10' : 'hover:bg-primary/5'}`}
+    <div
+      className={`group flex items-center rounded-xl transition-all ${isActive ? 'bg-primary/10 ring-1 ring-primary/20' : 'hover:bg-primary/5'}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex-1 cursor-pointer min-w-0" onClick={() => playFromLiked(index)}>
         <div className="flex items-center gap-3 px-2 sm:px-3 py-2.5">
-          <span className={`hidden sm:flex w-6 justify-center text-xs font-mono ${isActive ? "text-primary" : "text-base-content/40"}`}>
+
+          {/* Number / Equalizer / Play Button Logic */}
+          <span className={`relative hidden sm:flex w-6 h-4 justify-center items-center text-xs font-mono ${isActive ? "text-primary" : "text-base-content/40"}`}>
             {isActive && isPlaying ? (
               <span className="flex items-end justify-center gap-0.5 h-4">
                 <span className="w-[3px] rounded-full bg-primary animate-eq-1" />
                 <span className="w-[3px] rounded-full bg-primary animate-eq-2" />
                 <span className="w-[3px] rounded-full bg-primary animate-eq-3" />
               </span>
-            ) : index + 1}
+            ) : isActive ? (
+              <Play size={14} fill="currentColor" />
+            ) : (
+              <>
+                <span className="transition-opacity group-hover:opacity-0">{index + 1}</span>
+                <Play size={14} className="absolute opacity-0 transition-opacity group-hover:opacity-100" fill="currentColor" />
+              </>
+            )}
           </span>
-          
-          {/* REPLACED IMG WITH ALBUMART */}
-          <AlbumArt 
-            src={track.image} 
-            className="w-11 h-11 rounded-lg object-cover bg-base-300 shrink-0 shadow-md shadow-black/20" 
+
+          {/* Album Art with Active Ring */}
+          <AlbumArt
+            src={track.image}
+            className={`w-11 h-11 rounded-lg object-cover bg-base-300 shrink-0 shadow-[0_0_10px_rgba(0,0,0,0.3)] ${isActive ? "ring-1 ring-primary/30" : ""}`}
           />
-          
+
           <div className="min-w-0 flex-1">
             {shouldScroll ? (
               <>
@@ -182,7 +206,11 @@ function LikedItem({ track, index, isActive, isPlaying, playFromLiked, toggleLik
           </div>
         </div>
       </div>
-      <button onClick={() => toggleLike(track)} className="btn btn-ghost btn-xs sm:opacity-0 group-hover:sm:opacity-100 text-error hover:text-error mr-1 transition-all" title="Remove from Liked">
+      <button
+        onClick={() => toggleLike(track)}
+        className="btn btn-ghost btn-xs sm:opacity-0 group-hover:sm:opacity-100 text-error hover:text-error hover:bg-transparent focus:bg-transparent active:bg-transparent shadow-none border-none mr-1 transition-all"
+        title="Remove from Liked"
+      >
         <Heart size={16} className="fill-current" />
       </button>
     </div>
@@ -236,7 +264,7 @@ export function QueueView() {
       ) : (
         <div className="space-y-0.5">
           {userQueue.map((track, index) => (
-            <QueueItem 
+            <QueueItem
               key={track.queueId}
               track={track}
               index={index}
@@ -271,7 +299,7 @@ export function LikedView() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-error/20 flex items-center justify-center">
-             <Heart size={20} className="text-error fill-error" />
+            <Heart size={20} className="text-error fill-error" />
           </div>
           <div>
             <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">Liked Songs</h2>
@@ -296,7 +324,7 @@ export function LikedView() {
       ) : (
         <div className="space-y-0.5">
           {likedTracks.map((track, index) => (
-            <LikedItem 
+            <LikedItem
               key={track.id}
               track={track}
               index={index}
