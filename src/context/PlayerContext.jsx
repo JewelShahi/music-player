@@ -207,12 +207,15 @@ export function PlayerProvider({ children }) {
 
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
-    if (duration > 0 && currentTime > 0 && currentTime <= duration) {
-      navigator.mediaSession.setPositionState({
-        duration,
-        playbackRate: audioRef.current?.playbackRate || 1,
-        position: Math.min(currentTime, duration),
-      });
+    if (duration > 0) {
+      const position = audioRef.current?.currentTime || 0;
+      if (position <= duration) {
+        navigator.mediaSession.setPositionState({
+          duration,
+          playbackRate: audioRef.current?.playbackRate || 1,
+          position,
+        });
+      }
     }
   }, [currentTime, duration]);
 
