@@ -118,16 +118,15 @@ export function PlayerProvider({ children }) {
   }, [queue, currentIndex, shuffleOn, repeatMode, volume]);
 
   const playPrev = useCallback(() => {
-    const a = audioRef.current;
     let prevIdx = currentIndex - 1;
     if (prevIdx < 0) prevIdx = repeatMode === "all" ? queue.length - 1 : 0;
     const track = queue[prevIdx];
     if (track?.audio) {
       setCurrentIndex(prevIdx);
-      const aa = audioRef.current;
-      if (aa) {
-        aa.src = track.audio; aa.volume = volume;
-        aa.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+      const a = audioRef.current;
+      if (a) {
+        a.src = track.audio; a.volume = volume;
+        a.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
       }
     }
   }, [queue, currentIndex, repeatMode, volume]);
@@ -208,7 +207,7 @@ export function PlayerProvider({ children }) {
 
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
-    if (duration > 0) {
+    if (duration > 0 && currentTime > 0 && currentTime <= duration) {
       navigator.mediaSession.setPositionState({
         duration,
         playbackRate: audioRef.current?.playbackRate || 1,
