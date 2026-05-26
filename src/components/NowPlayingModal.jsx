@@ -129,7 +129,9 @@ export default function NowPlayingModal() {
           <button
             onClick={() => toggleUserQueue(currentTrack)}
             title={inQueue ? "Remove from Queue" : "Add to Queue"}
-            className={`btn btn-ghost btn-circle btn-sm ${inQueue ? "text-primary" : "text-white/40 hover:text-white/70"
+            className={`btn btn-ghost btn-circle btn-sm ${inQueue
+                ? "text-primary"
+                : "text-white/40 hover:text-primary"
               }`}
           >
             <ListPlus size={20} />
@@ -138,8 +140,8 @@ export default function NowPlayingModal() {
           <button
             onClick={() => toggleLike(currentTrack)}
             className={`btn btn-ghost btn-circle btn-sm ${isLiked(currentTrack.id)
-                ? "text-error"
-                : "text-white/40 hover:text-white/70"
+              ? "text-error"
+              : "text-white/40 hover:text-error"
               }`}
           >
             <Heart
