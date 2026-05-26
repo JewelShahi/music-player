@@ -41,7 +41,7 @@ const MiniTrackInfo = ({ track, isPlaying }) => (
         ) : (
           <p className="text-xs font-semibold truncate">{track.name}</p>
         )}
-        
+
         {/* Mobile Artist: Marquee if >= 20 chars, else truncate */}
         {track.artist.length >= 20 ? (
           <div className="marquee-container">
@@ -150,11 +150,33 @@ export default function Player() {
                     <p className="text-xs text-base-content/50 truncate">{currentTrack.artist}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0 ml-1">
-                    <button onClick={(e) => { e.stopPropagation(); toggleUserQueue(currentTrack); }} title="Add to Queue">
-                      <ListPlus size={16} className={isInUserQueue(currentTrack.id) ? "text-primary" : "text-base-content/60 hover:text-primary"} />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleUserQueue(currentTrack);
+                      }}
+                      title="Add to Queue"
+                      className={`btn btn-ghost btn-circle btn-xs ${isInUserQueue(currentTrack.id)
+                        ? "text-primary"
+                        : "text-base-content/60 hover:text-primary"
+                        }`}
+                    >
+                      <ListPlus size={16} />
                     </button>
-                    <button onClick={(e) => { e.stopPropagation(); toggleLike(currentTrack); }}>
-                      <Heart size={16} className={isLiked(currentTrack.id) ? "fill-error text-error" : "text-base-content/60 hover:text-base-content/70"} />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleLike(currentTrack);
+                      }}
+                      className={`btn btn-ghost btn-circle btn-xs ${isLiked(currentTrack.id)
+                        ? "text-error"
+                        : "text-base-content/60 hover:text-error"
+                        }`}
+                    >
+                      <Heart
+                        size={16}
+                        className={isLiked(currentTrack.id) ? "fill-error" : ""}
+                      />
                     </button>
                   </div>
                 </>
@@ -165,8 +187,15 @@ export default function Player() {
               <div className="flex items-center gap-4">
                 <button onClick={toggleShuffle} className={`btn btn-ghost btn-circle btn-xs ${shuffleOn ? "text-primary" : "text-base-content/50"}`}><Shuffle size={15} /></button>
                 <button onClick={playPrev} className="btn btn-ghost btn-circle btn-sm text-base-content/80 hover:text-base-content"><SkipBack size={18} fill="currentColor" /></button>
-                <button onClick={togglePlay} className="btn btn-circle btn-md bg-primary-content text-primary hover:bg-primary-content/80 border-none shadow-lg shadow-black/20">
-                  {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-0.5" />}
+                <button
+                  onClick={togglePlay}
+                  className="btn btn-circle btn-md bg-primary-content text-primary hover:bg-primary hover:text-white border-none shadow-lg shadow-black/20"
+                >
+                  {isPlaying ? (
+                    <Pause size={20} fill="currentColor" />
+                  ) : (
+                    <Play size={20} fill="currentColor" className="ml-0.5" />
+                  )}
                 </button>
                 <button onClick={playNext} className="btn btn-ghost btn-circle btn-sm text-base-content/80 hover:text-base-content"><SkipForward size={18} fill="currentColor" /></button>
                 <button onClick={toggleRepeat} className={`btn btn-ghost btn-circle btn-xs ${repeatMode !== "off" ? "text-primary" : "text-base-content/50"}`}>
@@ -174,14 +203,19 @@ export default function Player() {
                 </button>
               </div>
               <div className="flex items-center gap-3 w-full max-w-md text-[10px] text-base-content/50 font-mono">
-                <span className="w-8 text-right">{formatTime(currentTime)}</span>
+                <span className="font-black w-8 text-right">{formatTime(currentTime)}</span>
                 <span className="flex-1" />
-                <span className="w-8">{formatTime(duration)}</span>
+                <span className="font-black w-8">{formatTime(duration)}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-2 w-1/4 justify-end">
-              <button onClick={() => setVolume(volume === 0 ? 0.2 : 0)} className="btn btn-ghost btn-xs text-base-content/50"><VolIcon size={16} /></button>
+              <button
+                onClick={() => setVolume(volume === 0 ? 0.2 : 0)}
+                className="btn btn-ghost btn-circle btn-xs text-base-content/50 hover:text-base-content/70"
+              >
+                <VolIcon size={16} />
+              </button>
               <input
                 type="range" min="0" max="1" step="0.01"
                 value={isVolDragging ? volVal : volume}
@@ -191,7 +225,12 @@ export default function Player() {
                 onChange={handleVolChange}
                 onMouseUp={handleVolEnd} onTouchEnd={handleVolEnd}
               />
-              <button onClick={() => setShowNP(true)} className="btn btn-ghost btn-xs text-base-content/50 ml-1"><Maximize2 size={15} /></button>
+              <button
+                onClick={() => setShowNP(true)}
+                className="btn btn-ghost btn-circle btn-xs text-base-content/50 hover:text-base-content/70 ml-1"
+              >
+                <Maximize2 size={15} />
+              </button>
             </div>
           </div>
         </div>
@@ -222,20 +261,59 @@ export default function Player() {
               <MiniTrackInfo track={currentTrack} isPlaying={isPlaying} />
               {currentTrack && (
                 <>
-                  <button onClick={() => toggleUserQueue(currentTrack)} className="btn btn-ghost btn-xs shrink-0 px-1">
-                    <ListPlus size={15} className={isInUserQueue(currentTrack.id) ? "text-primary" : "text-base-content/50"} />
+                  <button
+                    onClick={() => toggleUserQueue(currentTrack)}
+                    className={`btn btn-ghost btn-circle btn-xs shrink-0 px-1 ${isInUserQueue(currentTrack.id)
+                      ? "text-primary"
+                      : "text-base-content/50 hover:text-primary"
+                      }`}
+                  >
+                    <ListPlus size={15} />
                   </button>
-                  <button onClick={() => toggleLike(currentTrack)} className="btn btn-ghost btn-xs shrink-0 px-1">
-                    <Heart size={15} className={isLiked(currentTrack.id) ? "fill-error text-error" : "text-base-content/50"} />
+
+                  <button
+                    onClick={() => toggleLike(currentTrack)}
+                    className={`btn btn-ghost btn-circle btn-xs shrink-0 px-1 ${isLiked(currentTrack.id)
+                        ? "text-error"
+                        : "text-base-content/50 hover:text-error"
+                      }`}
+                  >
+                    <Heart
+                      size={15}
+                      className={isLiked(currentTrack.id) ? "fill-error" : ""}
+                    />
                   </button>
                 </>
               )}
-              <button onClick={playPrev} className="btn btn-ghost btn-xs text-base-content/80 shrink-0 px-1"><SkipBack size={18} fill="currentColor" /></button>
-              <button onClick={togglePlay} className="btn btn-circle btn-sm bg-primary-content text-primary border-none shrink-0 shadow-md">
-                {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
+              <button
+                onClick={playPrev}
+                className="btn btn-ghost btn-circle btn-xs text-base-content/80 hover:text-base-content shrink-0 px-1"
+              >
+                <SkipBack size={18} fill="currentColor" />
               </button>
-              <button onClick={playNext} className="btn btn-ghost btn-xs text-base-content/80 shrink-0 px-1"><SkipForward size={18} fill="currentColor" /></button>
-              <button onClick={() => setShowNP(true)} className="btn btn-ghost btn-xs text-base-content/50 shrink-0 px-1"><Maximize2 size={16} /></button>
+              <button
+                onClick={togglePlay}
+                className="btn btn-circle btn-sm bg-primary-content text-primary border-none shrink-0 shadow-md hover:bg-primary hover:text-white"
+              >
+                {isPlaying ? (
+                  <Pause size={16} fill="currentColor" />
+                ) : (
+                  <Play size={16} fill="currentColor" className="ml-0.5" />
+                )}
+              </button>
+              <button
+                onClick={playNext}
+                className="btn btn-ghost btn-circle btn-xs text-base-content/80 hover:text-base-content shrink-0 px-1"
+              >
+                <SkipForward size={18} fill="currentColor" />
+              </button>
+
+              <button
+                onClick={() => setShowNP(true)}
+                className="btn btn-ghost btn-circle btn-xs text-base-content/50 hover:text-base-content/70 shrink-0 px-1"
+              >
+                <Maximize2 size={16} />
+              </button>
             </div>
           </div>
         </div>

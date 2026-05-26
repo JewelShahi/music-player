@@ -87,7 +87,7 @@ export default function NowPlayingModal() {
           ) : (
             <h3 className="text-xl font-bold text-white truncate mb-1">{currentTrack.name}</h3>
           )}
-          
+
           <div>
             <p className="text-sm text-white/60">
               {currentTrack.artist}
@@ -126,13 +126,31 @@ export default function NowPlayingModal() {
         </div>
 
         <div className="w-full flex items-center gap-4 max-w-xs">
-          <button onClick={() => toggleUserQueue(currentTrack)} title={inQueue ? "Remove from Queue" : "Add to Queue"}>
-            <ListPlus size={20} className={inQueue ? "text-primary" : "text-white/40"} />
+          <button
+            onClick={() => toggleUserQueue(currentTrack)}
+            title={inQueue ? "Remove from Queue" : "Add to Queue"}
+            className={`btn btn-ghost btn-circle btn-sm ${inQueue ? "text-primary" : "text-white/40 hover:text-white/70"
+              }`}
+          >
+            <ListPlus size={20} />
           </button>
-          <button onClick={() => toggleLike(currentTrack)}>
-            <Heart size={20} className={isLiked(currentTrack.id) ? "fill-error text-error" : "text-white/40"} />
+
+          <button
+            onClick={() => toggleLike(currentTrack)}
+            className={`btn btn-ghost btn-circle btn-sm ${isLiked(currentTrack.id)
+                ? "text-error"
+                : "text-white/40 hover:text-white/70"
+              }`}
+          >
+            <Heart
+              size={20}
+              className={isLiked(currentTrack.id) ? "fill-error" : ""}
+            />
           </button>
-          <button onClick={() => setVolume(volume === 0 ? 0.2 : 0)} className="text-white/40">
+          <button
+            onClick={() => setVolume(volume === 0 ? 0.2 : 0)}
+            className="btn btn-ghost btn-circle btn-sm text-white/40 hover:text-white/70"
+          >
             <VolIcon size={18} />
           </button>
           <input

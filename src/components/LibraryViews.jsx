@@ -109,7 +109,7 @@ function QueueItem({ track, index, isActive, isPlaying, playFromQueue, removeFro
       </div>
       <button
         onClick={() => removeFromUserQueue(track.queueId)}
-        className="btn btn-ghost btn-xs sm:opacity-0 group-hover:sm:opacity-100 text-base-content/40 hover:text-error hover:bg-transparent focus:bg-transparent active:bg-transparent shadow-none border-none mr-1 transition-all"
+        className="btn btn-ghost btn-circle btn-sm sm:opacity-0 group-hover:sm:opacity-100 text-base-content/40 hover:text-error hover:bg-base-content/10 focus:bg-base-content/10 active:bg-base-content/10 shadow-none border-none mr-1 transition-all"
         title="Remove from Queue"
       >
         <X size={16} />
@@ -208,7 +208,7 @@ function LikedItem({ track, index, isActive, isPlaying, playFromLiked, toggleLik
       </div>
       <button
         onClick={() => toggleLike(track)}
-        className="btn btn-ghost btn-xs sm:opacity-0 group-hover:sm:opacity-100 text-error hover:text-error hover:bg-transparent focus:bg-transparent active:bg-transparent shadow-none border-none mr-1 transition-all"
+        className="btn btn-ghost btn-circle btn-sm sm:opacity-0 group-hover:sm:opacity-100 text-error hover:text-error hover:bg-base-content/10 focus:bg-base-content/10 active:bg-base-content/10 shadow-none border-none mr-1 transition-all"
         title="Remove from Liked"
       >
         <Heart size={16} className="fill-current" />

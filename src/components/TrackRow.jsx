@@ -28,11 +28,11 @@ function TrackRow({ track, index, tracks }) {
   const active = currentTrack?.id === track.id;
   const inQueue = isInUserQueue(track.id);
   const liked = isLiked(track.id);
-  
+
   // Track hover state to enable marquee
   const [isHovered, setIsHovered] = useState(false);
   const shouldScroll = active || isHovered;
-  
+
   // Mobile character length checks
   const titleLen = track.name.length;
   const artistLen = track.artist.length;
@@ -52,9 +52,8 @@ function TrackRow({ track, index, tracks }) {
       onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`track-row group flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all ${
-        active ? "bg-primary/10 ring-1 ring-primary/20" : "hover:bg-primary/5"
-      }`}
+      className={`track-row group flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all ${active ? "bg-primary/10 ring-1 ring-primary/20" : "hover:bg-primary/5"
+        }`}
     >
       {/* ── Number / Equalizer / Play Button Logic ── */}
       <div className="relative w-6 h-4 text-center shrink-0 flex items-center justify-center">
@@ -103,7 +102,7 @@ function TrackRow({ track, index, tracks }) {
             ) : (
               <p className={`text-sm font-medium truncate sm:hidden ${active ? "text-primary-content" : ""}`}>{track.name}</p>
             )}
-            
+
             {/* ── Desktop Title: Marquee ONLY if truncated by browser ── */}
             {isDesktopTitleTruncated ? (
               <div className="marquee-container hidden sm:block">
@@ -122,7 +121,7 @@ function TrackRow({ track, index, tracks }) {
             <p ref={desktopTitleRef} className={`text-sm font-medium truncate ${active ? "text-primary-content" : ""}`}>{track.name}</p>
           </>
         )}
-        
+
         {shouldScroll ? (
           <>
             {/* ── Mobile Artist: Marquee if >= 15 chars ── */}
@@ -150,10 +149,10 @@ function TrackRow({ track, index, tracks }) {
             )}
           </>
         ) : (
-           // Default state (not hovered/active)
-           <>
-             <p ref={desktopArtistRef} className="text-xs text-base-content/50 truncate">{track.artist}</p>
-           </>
+          // Default state (not hovered/active)
+          <>
+            <p ref={desktopArtistRef} className="text-xs text-base-content/50 truncate">{track.artist}</p>
+          </>
         )}
       </div>
 
@@ -162,18 +161,33 @@ function TrackRow({ track, index, tracks }) {
       )}
 
       <button
-        onClick={(e) => { e.stopPropagation(); toggleUserQueue(track); }}
-        className={`shrink-0 transition-opacity ${inQueue ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleUserQueue(track);
+        }}
+        className={`btn btn-ghost btn-circle btn-xs shrink-0 transition-opacity ${inQueue
+            ? "opacity-100 text-primary"
+            : "opacity-0 group-hover:opacity-100 text-base-content/60 hover:text-primary"
+          }`}
         title={inQueue ? "Remove from Queue" : "Add to Queue"}
       >
-        <ListPlus size={16} className={inQueue ? "text-primary" : "text-base-content/60 hover:text-primary"} />
+        <ListPlus size={16} />
       </button>
 
       <button
-        onClick={(e) => { e.stopPropagation(); toggleLike(track); }}
-        className={`shrink-0 transition-opacity ${liked ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleLike(track);
+        }}
+        className={`btn btn-ghost btn-circle btn-xs shrink-0 transition-opacity ${liked
+          ? "opacity-100 text-error"
+          : "opacity-0 group-hover:opacity-100 text-base-content/60 hover:text-error"
+          }`}
       >
-        <Heart size={15} className={liked ? "fill-error text-error" : "text-base-content/60 hover:text-base-content/40"} />
+        <Heart
+          size={15}
+          className={liked ? "fill-error" : ""}
+        />
       </button>
 
       <span className="text-xs text-base-content/60 font-mono shrink-0 w-10 text-right">
