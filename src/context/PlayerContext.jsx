@@ -206,6 +206,17 @@ export function PlayerProvider({ children }) {
     navigator.mediaSession.setActionHandler("nexttrack", () => playNext());
   }, [currentTrack, togglePlay, playPrev, playNext]);
 
+  useEffect(() => {
+    if (!("mediaSession" in navigator)) return;
+    if (duration > 0) {
+      navigator.mediaSession.setPositionState({
+        duration,
+        playbackRate: audioRef.current?.playbackRate || 1,
+        position: Math.min(currentTime, duration),
+      });
+    }
+  }, [currentTime, duration]);
+
   const seek = useCallback((time) => {
     if (audioRef.current) { audioRef.current.currentTime = time; setCurrentTime(time); }
   }, []);
