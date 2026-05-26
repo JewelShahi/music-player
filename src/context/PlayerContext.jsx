@@ -206,18 +206,28 @@ export function PlayerProvider({ children }) {
   }, [currentTrack, togglePlay, playPrev, playNext]);
 
   useEffect(() => {
-    if (!("mediaSession" in navigator)) return;
-    if (duration > 0) {
-      const position = audioRef.current?.currentTime || 0;
-      if (position <= duration) {
-        navigator.mediaSession.setPositionState({
-          duration,
-          playbackRate: audioRef.current?.playbackRate || 1,
-          position,
-        });
+    const interval = setInterval(() => {
+      if (audioRef.current && !audioRef.current.paused) {
+        localStorage.setItem("mp_currentTime", audioRef.current.currentTime.toString());
+        localStorage.setItem("mp_currentTrackId", currentTrack?.id || "");
       }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [currentTrack]);
+
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a || !currentTrack) return;
+    const savedId = localStorage.getItem("mp_currentTrackId");
+    const savedTime = parseFloat(localStorage.getItem("mp_currentTime") || "0");
+    if (savedId === currentTrack.id && savedTime > 0) {
+      const onCanPlay = () => {
+        a.currentTime = savedTime;
+        a.removeEventListener("canplay", onCanPlay);
+      };
+      a.addEventListener("canplay", onCanPlay);
     }
-  }, [currentTime, duration]);
+  }, [currentTrack]);
 
   const seek = useCallback((time) => {
     if (audioRef.current) { audioRef.current.currentTime = time; setCurrentTime(time); }
