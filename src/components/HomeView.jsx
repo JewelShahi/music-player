@@ -49,6 +49,16 @@ export function HomeView() {
         apiQuery = apiQuery ? `Phonk ${apiQuery}` : "Phonk"; // Add Phonk to the search query
       }
 
+      if (genre === "R&B") {
+        apiGenre = ""; // Clear the genre filter
+        apiQuery = apiQuery ? `R&B ${apiQuery}` : "R&B"; // Add R&B to the search query
+      }
+
+      if (genre === "Indie") {
+        apiGenre = ""; // Clear the genre filter
+        apiQuery = apiQuery ? `Indie ${apiQuery}` : "Indie"; // Add Indie to the search query
+      }
+
       const isSearching = apiQuery.length > 0; // Use the modified apiQuery
 
       if (isSearching) {

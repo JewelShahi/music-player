@@ -67,7 +67,7 @@ export default function Player() {
     repeatMode, shuffleOn, isLiked, toggleLike, isInUserQueue, toggleUserQueue,
     currentView, setCurrentView,
     togglePlay, playNext, playPrev, seek, setVolume,
-    toggleRepeat, toggleShuffle, setShowNP, seekDragging, formatTime,
+    toggleRepeat, toggleShuffle, setShowNP, seekDragging, formatTime,canNext, canPrev
   } = usePlayer();
 
   const [isSeeking, setIsSeeking] = useState(false);
@@ -196,7 +196,9 @@ export default function Player() {
             <div className="flex-1 flex flex-col items-center gap-0.5">
               <div className="flex items-center gap-4">
                 <button onClick={toggleShuffle} className={`btn btn-ghost btn-circle btn-xs ${shuffleOn ? "text-primary" : "text-base-content/50"}`}><Shuffle size={15} /></button>
-                <button onClick={playPrev} className="btn btn-ghost btn-circle btn-sm text-base-content/80 hover:text-base-content"><SkipBack size={18} fill="currentColor" /></button>
+                <button onClick={playPrev} className="btn btn-ghost btn-circle btn-sm text-base-content/80 hover:text-base-content" disabled={!canPrev}>
+                  <SkipBack size={18} fill="currentColor" />
+                </button>
                 <button
                   onClick={togglePlay}
                   className="btn btn-circle btn-md bg-primary text-white hover:bg-primary-content hover:text-primary border-none shadow-lg shadow-black/20"
@@ -207,7 +209,9 @@ export default function Player() {
                     <Play size={20} fill="currentColor" className="ml-0.5" />
                   )}
                 </button>
-                <button onClick={playNext} className="btn btn-ghost btn-circle btn-sm text-base-content/80 hover:text-base-content"><SkipForward size={18} fill="currentColor" /></button>
+                <button onClick={playNext} className="btn btn-ghost btn-circle btn-sm text-base-content/80 hover:text-base-content" disabled={!canNext}>
+                  <SkipForward size={18} fill="currentColor" />
+                </button>
                 <button onClick={toggleRepeat} className={`btn btn-ghost btn-circle btn-xs ${repeatMode !== "off" ? "text-primary" : "text-base-content/50"}`}>
                   {repeatMode === "one" ? <Repeat1 size={15} /> : <Repeat size={15} />}
                 </button>
@@ -302,6 +306,7 @@ export default function Player() {
               <button
                 onClick={playPrev}
                 className="btn btn-ghost btn-circle btn-xs text-base-content/80 hover:text-base-content shrink-0 px-1"
+                disabled={!canPrev}
               >
                 <SkipBack size={18} fill="currentColor" />
               </button>
@@ -318,6 +323,7 @@ export default function Player() {
               <button
                 onClick={playNext}
                 className="btn btn-ghost btn-circle btn-xs text-base-content/80 hover:text-base-content shrink-0 px-1"
+                disabled={!canNext}
               >
                 <SkipForward size={18} fill="currentColor" />
               </button>

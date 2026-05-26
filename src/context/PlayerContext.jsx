@@ -11,15 +11,44 @@ function formatTime(s) {
   return `${m}:${String(sec).padStart(2, "0")}`;
 }
 
+function toTrackSnapshot(track) {
+  if (!track) return null;
+  return {
+    id: track.id ?? null,
+    name: track.name ?? "",
+    artist: track.artist ?? "",
+    image: track.image || null,
+    audio: track.audio || null,
+    genre: track.genre || null,
+    duration: track.duration || null,
+  };
+}
+
+// ─── Read last track from localStorage (used by multiple initializers) ──────
+function getSavedLastTrack() {
+  try { return JSON.parse(localStorage.getItem("mp_last_track") || "null"); } catch { return null; }
+}
+
 export function PlayerProvider({ children }) {
   const audioRef = useRef(null);
   const seekDragging = useRef(false);
   const activeTrackIdRef = useRef(null);
   const skipErrorCount = useRef(0);
 
-  const [queue, setQueue] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(-1);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const currentTrackRef = useRef(null);
+
+  // ─── Initialize queue & index from last played track ────────────────────
+  const [queue, setQueue] = useState(() => {
+    const lt = getSavedLastTrack();
+    return lt ? [lt] : [];
+  });
+
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    const lt = getSavedLastTrack();
+    return lt ? 0 : -1;
+  });
+
+  const [isPlaying, setIsPlaying] = useState(false);            // always starts paused
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
@@ -43,10 +72,7 @@ export function PlayerProvider({ children }) {
     try { return localStorage.getItem("mp_theme") || "midnight"; } catch { return "midnight"; }
   });
 
-  // ─── Last played track (no timestamp, no position) ──────────────────────────
-  const [lastTrack, setLastTrack] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("mp_last_track") || "null"); } catch { return null; }
-  });
+  const [lastTrack, setLastTrack] = useState(() => getSavedLastTrack());
 
   const setTheme = useCallback((t) => {
     setThemeRaw(t);
@@ -65,12 +91,68 @@ export function PlayerProvider({ children }) {
 
   const currentTrack = currentIndex >= 0 && currentIndex < queue.length ? queue[currentIndex] : null;
 
-  // ─── Persist preferences ─────────────────────────────────────────────────────
+  useEffect(() => {
+    if (currentTrack) currentTrackRef.current = currentTrack;
+  }, [currentTrack]);
+
+  // ─── Persist preferences ──────────────────────────────────────────────────
   useEffect(() => { localStorage.setItem("mp_queue", JSON.stringify(userQueue)); }, [userQueue]);
   useEffect(() => { localStorage.setItem("mp_volume", volume.toString()); }, [volume]);
   useEffect(() => { if (audioRef.current) audioRef.current.volume = volume; }, [volume]);
 
-  // ─── Centralised Media Session position sync ─────────────────────────────────
+  // ─── Request persistent storage ───────────────────────────────────────────
+  useEffect(() => {
+    if (navigator.storage && navigator.storage.persist) {
+      navigator.storage.persist().catch(() => {});
+    }
+  }, []);
+
+  // ─── FLUSH last track on pagehide / beforeunload / visibility hidden ──────
+  useEffect(() => {
+    const flush = () => {
+      const t = currentTrackRef.current;
+      if (t) {
+        try {
+          localStorage.setItem("mp_last_track", JSON.stringify(toTrackSnapshot(t)));
+        } catch (_) {}
+      }
+    };
+
+    const onPageHide     = () => flush();
+    const onBeforeUnload = () => flush();
+    const onVisibility   = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+
+    window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("beforeunload", onBeforeUnload);
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
+
+  // ─── Restore last track on mount — NO autoplay ───────────────────────────
+  //     Loads the audio src so metadata/duration appears, but stays paused.
+  useEffect(() => {
+    const a = audioRef.current;
+    const lt = lastTrack;
+
+    if (!a || !lt?.audio) return;
+
+    // If something is already playing (user clicked very fast), don't override
+    if (activeTrackIdRef.current) return;
+
+    a.src = lt.audio;
+    a.volume = volume;
+    a.load();                          // fetch metadata so duration shows
+    // deliberately NOT calling a.play()
+  }, []); // mount-only — intentionally captures initial values
+
+  // ─── Centralised Media Session position sync ──────────────────────────────
   const syncMediaPosition = useCallback((position = 0, forcedDuration) => {
     if (!("mediaSession" in navigator)) return;
     const a = audioRef.current;
@@ -88,7 +170,7 @@ export function PlayerProvider({ children }) {
     } catch (_) { }
   }, []);
 
-  // ─── Can next / can prev ──────────────────────────────────────────────────────
+  // ─── Can next / can prev ──────────────────────────────────────────────────
   const canNext = queue.length > 0 && (
     shuffleOn ||
     repeatMode === "all" ||
@@ -103,23 +185,23 @@ export function PlayerProvider({ children }) {
     currentTime > 3
   );
 
-  // ─── Shared internal load-and-play ───────────────────────────────────────────
+  // ─── Shared internal load-and-play ────────────────────────────────────────
   const _loadAndPlay = useCallback((track, idx, resolvedQueue) => {
     if (!track?.audio) return;
     skipErrorCount.current = 0;
     activeTrackIdRef.current = track.id;
+    currentTrackRef.current = track;
 
     setCurrentIndex(idx);
     setCurrentTime(0);
     setDuration(0);
 
-    // Persist last played track (no position saved — intentional)
     try {
-      localStorage.setItem("mp_last_track", JSON.stringify(track));
-      setLastTrack(track);
+      const snap = toTrackSnapshot(track);
+      localStorage.setItem("mp_last_track", JSON.stringify(snap));
+      setLastTrack(snap);
     } catch (_) { }
 
-    // Immediately wipe OS widget so it won't show the previous track's position
     if ("mediaSession" in navigator) {
       try { navigator.mediaSession.setPositionState(null); } catch (_) { }
     }
@@ -132,7 +214,6 @@ export function PlayerProvider({ children }) {
     a.currentTime = 0;
     a.volume = volume;
 
-    // Push 0:00 with real duration as soon as the browser knows it
     const onMeta = () => {
       if (activeTrackIdRef.current !== track.id) return;
       const d = a.duration;
@@ -152,7 +233,7 @@ export function PlayerProvider({ children }) {
       .catch(() => setIsPlaying(false));
   }, [volume, syncMediaPosition]);
 
-  // ─── Public playback API ─────────────────────────────────────────────────────
+  // ─── Public playback API ──────────────────────────────────────────────────
   const playTrack = useCallback((track, newQueue, index) => {
     const resolvedQueue = newQueue || queue;
     setQueue(resolvedQueue);
@@ -197,7 +278,7 @@ export function PlayerProvider({ children }) {
     if (track) _loadAndPlay(track, prevIdx, queue);
   }, [queue, currentIndex, repeatMode, _loadAndPlay, syncMediaPosition]);
 
-  // ─── Seek ─────────────────────────────────────────────────────────────────────
+  // ─── Seek ─────────────────────────────────────────────────────────────────
   const seek = useCallback((time) => {
     const a = audioRef.current;
     if (!a) return;
@@ -206,7 +287,7 @@ export function PlayerProvider({ children }) {
     syncMediaPosition(time, a.duration);
   }, [syncMediaPosition]);
 
-  // ─── Audio element events ─────────────────────────────────────────────────────
+  // ─── Audio element events ─────────────────────────────────────────────────
   const lastSyncRef = useRef(0);
   useEffect(() => {
     const a = audioRef.current;
@@ -307,7 +388,7 @@ export function PlayerProvider({ children }) {
     };
   }, [repeatMode, queue, playNext, syncMediaPosition]);
 
-  // ─── OS Media Session metadata + explicit play/pause handlers ────────────────
+  // ─── OS Media Session metadata + explicit play/pause handlers ─────────────
   useEffect(() => {
     if (!currentTrack || !("mediaSession" in navigator)) return;
 
@@ -333,7 +414,6 @@ export function PlayerProvider({ children }) {
       syncMediaPosition(audioRef.current?.currentTime || 0, audioRef.current?.duration);
     });
 
-    // Pass null when the action isn't available — this removes the button from the OS widget
     navigator.mediaSession.setActionHandler("previoustrack", canPrev ? () => playPrev() : null);
     navigator.mediaSession.setActionHandler("nexttrack", canNext ? () => playNext() : null);
 
@@ -354,7 +434,7 @@ export function PlayerProvider({ children }) {
     }
   }, [isPlaying]);
 
-  // ─── Re-sync OS widget on foreground restore ─────────────────────────────────
+  // ─── Re-sync OS widget on foreground restore ──────────────────────────────
   useEffect(() => {
     const handleVisibility = () => {
       const a = audioRef.current;
@@ -368,7 +448,7 @@ export function PlayerProvider({ children }) {
     return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, [syncMediaPosition]);
 
-  // ─── User Queue ───────────────────────────────────────────────────────────────
+  // ─── User Queue ───────────────────────────────────────────────────────────
   const isInUserQueue = useCallback((id) => userQueue.some((t) => t.id === id), [userQueue]);
   const toggleUserQueue = useCallback((track) => {
     setUserQueue((prev) => {
@@ -380,7 +460,7 @@ export function PlayerProvider({ children }) {
   const removeFromUserQueue = useCallback((queueId) => setUserQueue((prev) => prev.filter((t) => t.queueId !== queueId)), []);
   const clearUserQueue = useCallback(() => setUserQueue([]), []);
 
-  // ─── Liked Tracks ─────────────────────────────────────────────────────────────
+  // ─── Liked Tracks ────────────────────────────────────────────────────────
   const toggleLike = useCallback((track) => {
     setLikedMap((prev) => {
       const next = { ...prev };
@@ -393,17 +473,17 @@ export function PlayerProvider({ children }) {
   const isLiked = useCallback((id) => !!likedMap[id], [likedMap]);
   const likedTracks = Object.values(likedMap);
 
-  // ─── Volume ───────────────────────────────────────────────────────────────────
+  // ─── Volume ──────────────────────────────────────────────────────────────
   const setVolume = useCallback((v) => {
     setVolumeRaw(v);
     if (audioRef.current) audioRef.current.volume = v;
   }, []);
 
-  // ─── Repeat / Shuffle ─────────────────────────────────────────────────────────
+  // ─── Repeat / Shuffle ────────────────────────────────────────────────────
   const toggleRepeat = useCallback(() => setRepeatMode((p) => (p === "off" ? "all" : p === "all" ? "one" : "off")), []);
   const toggleShuffle = useCallback(() => setShuffleOn((p) => !p), []);
 
-  // ─── Spacebar shortcut ────────────────────────────────────────────────────────
+  // ─── Spacebar shortcut ──────────────────────────────────────────────────
   useEffect(() => {
     const handler = (e) => {
       if (e.target.tagName === "INPUT") return;

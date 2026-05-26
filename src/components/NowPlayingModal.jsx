@@ -11,7 +11,7 @@ export default function NowPlayingModal() {
     showNP, setShowNP, currentTrack, isPlaying, currentTime, duration,
     volume, repeatMode, shuffleOn, isLiked, toggleLike, isInUserQueue, toggleUserQueue,
     togglePlay, playNext, playPrev, seek, setVolume,
-    toggleRepeat, toggleShuffle, seekDragging, formatTime, setCurrentView,
+    toggleRepeat, toggleShuffle, seekDragging, formatTime, setCurrentView, canNext, canPrev
   } = usePlayer();
 
   const [isSeeking, setIsSeeking] = useState(false);
@@ -116,7 +116,9 @@ export default function NowPlayingModal() {
 
         <div className="flex items-center justify-center gap-5 mb-6">
           <button onClick={toggleShuffle} className={`btn btn-ghost btn-circle btn-sm ${shuffleOn ? "text-primary" : "text-white/40 hover:text-white/70"}`}><Shuffle size={18} /></button>
-          <button onClick={playPrev} className="btn btn-ghost btn-circle text-white/80 hover:text-white"><SkipBack size={22} fill="currentColor" /></button>
+          <button onClick={playPrev} className="btn btn-ghost btn-circle text-white/80 hover:text-white" disabled={!canPrev}>
+            <SkipBack size={22} fill="currentColor" />
+          </button>
           <button
             onClick={togglePlay}
             className="btn btn-circle bg-primary text-white hover:bg-primary-content hover:text-primary border-none w-14 h-14 shadow-xl shadow-black/20"
@@ -127,7 +129,9 @@ export default function NowPlayingModal() {
               <Play size={24} fill="currentColor" className="ml-1" />
             )}
           </button>
-          <button onClick={playNext} className="btn btn-ghost btn-circle text-white/80 hover:text-white"><SkipForward size={22} fill="currentColor" /></button>
+          <button onClick={playNext} className="btn btn-ghost btn-circle text-white/80 hover:text-white" disabled={!canNext}>
+            <SkipForward size={22} fill="currentColor" />
+          </button>
           <button onClick={toggleRepeat} className={`btn btn-ghost btn-circle btn-sm ${repeatMode !== "off" ? "text-primary" : "text-white/40 hover:text-white/70"}`}>
             {repeatMode === "one" ? <Repeat1 size={18} /> : <Repeat size={18} />}
           </button>
