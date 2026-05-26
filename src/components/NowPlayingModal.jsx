@@ -119,7 +119,7 @@ export default function NowPlayingModal() {
           <button onClick={playPrev} className="btn btn-ghost btn-circle text-white/80 hover:text-white"><SkipBack size={22} fill="currentColor" /></button>
           <button
             onClick={togglePlay}
-            className="btn btn-circle bg-white text-primary hover:bg-primary hover:text-white border-none w-14 h-14 shadow-xl shadow-black/20"
+            className="btn btn-circle bg-primary text-white hover:bg-primary-content hover:text-primary border-none w-14 h-14 shadow-xl shadow-black/20"
           >
             {isPlaying ? (
               <Pause size={24} fill="currentColor" />

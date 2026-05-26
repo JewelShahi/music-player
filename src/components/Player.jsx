@@ -190,7 +190,7 @@ export default function Player() {
                 <button onClick={playPrev} className="btn btn-ghost btn-circle btn-sm text-base-content/80 hover:text-base-content"><SkipBack size={18} fill="currentColor" /></button>
                 <button
                   onClick={togglePlay}
-                  className="btn btn-circle btn-md bg-primary-content text-primary hover:bg-primary hover:text-white border-none shadow-lg shadow-black/20"
+                  className="btn btn-circle btn-md bg-primary text-white hover:bg-primary-content hover:text-primary border-none shadow-lg shadow-black/20"
                 >
                   {isPlaying ? (
                     <Pause size={20} fill="currentColor" />
@@ -294,7 +294,7 @@ export default function Player() {
               </button>
               <button
                 onClick={togglePlay}
-                className="btn btn-circle btn-sm bg-primary-content text-primary border-none shrink-0 shadow-md hover:bg-primary hover:text-white"
+                className="btn btn-circle btn-sm bg-primary text-white border-none shrink-0 shadow-md hover:bg-primary-content hover:text-primary"
               >
                 {isPlaying ? (
                   <Pause size={16} fill="currentColor" />
