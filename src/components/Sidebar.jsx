@@ -118,7 +118,7 @@ export default function Sidebar({ initing }) {
             <item.icon size={18} />
             <span>{item.label}</span>
             {item.badge && (
-              <span className="ml-auto text-[11px] bg-base-content/10 text-base-content/50 px-1.5 py-0.5 rounded-full min-w-[24px] h-6 flex items-center justify-center">
+              <span className="ml-auto text-[11px] bg-secondary/20 text-white/80 px-1.5 py-0.5 rounded-full min-w-[24px] h-6 flex items-center justify-center">
                 {item.badge}
               </span>
             )}

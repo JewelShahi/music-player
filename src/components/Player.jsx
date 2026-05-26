@@ -130,6 +130,15 @@ export default function Player() {
             onChange={handleSeekChange}
             onEnd={handleSeekEnd}
           />
+          {/* Time indicators for desktop */}
+          <div className="flex items-center justify-between px-5 -mt-1 mb-0.5 h-0">
+            <span className="text-[12px] font-semibold tabular-nums text-base-content/40">
+              {formatTime(currentTime)}
+            </span>
+            <span className="text-[12px] font-semibold tabular-nums text-base-content/40">
+              {formatTime(duration)}
+            </span>
+          </div>
           <div className="h-[80px] flex items-center px-5 gap-5">
             <div className="flex items-center gap-3 w-1/4 min-w-0 cursor-pointer" onClick={() => setShowNP(true)}>
               {currentTrack ? (
@@ -203,11 +212,6 @@ export default function Player() {
                   {repeatMode === "one" ? <Repeat1 size={15} /> : <Repeat size={15} />}
                 </button>
               </div>
-              <div className="flex items-center gap-3 w-full max-w-md text-[10px] text-base-content/50 font-mono">
-                <span className="font-black w-8 text-right">{formatTime(currentTime)}</span>
-                <span className="flex-1" />
-                <span className="font-black w-8">{formatTime(duration)}</span>
-              </div>
             </div>
 
             <div className="flex items-center gap-2 w-1/4 justify-end">
@@ -258,6 +262,15 @@ export default function Player() {
               onChange={handleSeekChange}
               onEnd={handleSeekEnd}
             />
+            {/* Time indicators moved inside relative container to stay above ambient layers for mobile */}
+            <div className="flex items-center justify-between px-3 -mt-1 mb-0.5">
+              <span className="text-[10px] font-semibold tabular-nums text-base-content/40">
+                {formatTime(currentTime)}
+              </span>
+              <span className="text-[10px] font-semibold tabular-nums text-base-content/40">
+                {formatTime(duration)}
+              </span>
+            </div>
             <div className="flex items-center h-16 px-3 gap-1.5">
               <MiniTrackInfo track={currentTrack} isPlaying={isPlaying} />
               {currentTrack && (
@@ -275,8 +288,8 @@ export default function Player() {
                   <button
                     onClick={() => toggleLike(currentTrack)}
                     className={`btn btn-ghost btn-circle btn-xs shrink-0 px-1 ${isLiked(currentTrack.id)
-                        ? "text-error"
-                        : "text-base-content/50 hover:text-error"
+                      ? "text-error"
+                      : "text-base-content/50 hover:text-error"
                       }`}
                   >
                     <Heart

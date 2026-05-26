@@ -100,7 +100,7 @@ export default function NowPlayingModal() {
         </div>
 
         <div className="w-full flex items-center gap-3 mb-4">
-          <span className="text-[11px] text-white/50 font-mono w-10 text-right">{formatTime(currentTime)}</span>
+          <span className="text-[12px] text-white/50 font-semibold w-10 text-right">{formatTime(currentTime)}</span>
           <input
             type="range" min="0" max="1000"
             step={1}
@@ -111,7 +111,7 @@ export default function NowPlayingModal() {
             onChange={handleSeekChange}
             onMouseUp={handleSeekEnd} onTouchEnd={handleSeekEnd}
           />
-          <span className="text-[11px] text-white/50 font-mono w-10">{formatTime(duration)}</span>
+          <span className="text-[12px] text-white/50 font-semibold w-10">{formatTime(duration)}</span>
         </div>
 
         <div className="flex items-center justify-center gap-5 mb-6">

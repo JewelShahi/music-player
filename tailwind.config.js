@@ -4,23 +4,6 @@ export default {
 
   theme: {
     extend: {
-      colors: {
-        surface: {
-          1: "hsl(var(--b1))",
-          2: "hsl(var(--b2))",
-          3: "hsl(var(--b3))",
-          4: "hsl(var(--n))",
-        },
-
-        accent: {
-          DEFAULT: "hsl(var(--p))",
-          light: "hsl(var(--pc))",
-          dark: "hsl(var(--pf))",
-        },
-
-        secondary: "hsl(var(--s))",
-      },
-
       animation: {
         "eq-1": "eqBounce .6s ease-in-out infinite alternate",
         "eq-2": "eqBounce .6s .15s ease-in-out infinite alternate",
@@ -263,7 +246,7 @@ export default {
           error: "#ef4444",
         },
       },
-      
+
       /* ───────── Aurora ───────── */
       {
         aurora: {

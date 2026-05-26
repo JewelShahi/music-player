@@ -42,8 +42,8 @@ function QueueItem({ track, index, isActive, isPlaying, playFromQueue, removeFro
       <div className="flex-1 cursor-pointer min-w-0" onClick={() => playFromQueue(index)}>
         <div className="flex items-center gap-3 px-2 sm:px-3 py-2.5">
 
-          {/* Number / Equalizer / Play Button Logic */}
-          <span className={`relative hidden sm:flex w-6 h-4 justify-center items-center text-xs font-mono ${isActive ? "text-primary" : "text-base-content/40"}`}>
+          {/* Number / Equalizer / Play Button Logic - VISIBLE ON ALL SCREENS */}
+          <span className={`relative flex w-6 h-4 justify-center items-center text-xs font-mono ${isActive ? "text-primary" : "text-base-content/40"}`}>
             {isActive && isPlaying ? (
               <span className="flex items-end justify-center gap-0.5 h-4">
                 <span className="w-[3px] rounded-full bg-primary animate-eq-1" />
@@ -140,8 +140,8 @@ function LikedItem({ track, index, isActive, isPlaying, playFromLiked, toggleLik
       <div className="flex-1 cursor-pointer min-w-0" onClick={() => playFromLiked(index)}>
         <div className="flex items-center gap-3 px-2 sm:px-3 py-2.5">
 
-          {/* Number / Equalizer / Play Button Logic */}
-          <span className={`relative hidden sm:flex w-6 h-4 justify-center items-center text-xs font-mono ${isActive ? "text-primary" : "text-base-content/40"}`}>
+          {/* Number / Equalizer / Play Button Logic - VISIBLE ON ALL SCREENS */}
+          <span className={`relative flex w-6 h-4 justify-center items-center text-xs font-mono ${isActive ? "text-primary" : "text-base-content/40"}`}>
             {isActive && isPlaying ? (
               <span className="flex items-end justify-center gap-0.5 h-4">
                 <span className="w-[3px] rounded-full bg-primary animate-eq-1" />
@@ -268,7 +268,7 @@ export function QueueView() {
               key={track.queueId}
               track={track}
               index={index}
-              isActive={currentTrack?.queueId === track.queueId}
+              isActive={currentTrack?.id === track.id}
               isPlaying={isPlaying}
               playFromQueue={playFromQueue}
               removeFromUserQueue={removeFromUserQueue}
