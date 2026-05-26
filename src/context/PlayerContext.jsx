@@ -65,6 +65,49 @@ export function PlayerProvider({ children }) {
 
   const currentTrack = currentIndex >= 0 && currentIndex < queue.length ? queue[currentIndex] : null;
 
+  /* ── Restore from either last saved or current time ── */
+  useEffect(() => {
+    const lastTrackData = localStorage.getItem("mp_lastTrackData");
+    const lastPos = parseFloat(localStorage.getItem("mp_lastPosition") || "0");
+    // Also read the interval‑saved current time (more frequent)
+    const currentPos = parseFloat(localStorage.getItem("mp_currentTime") || "0");
+    const currentTrackId = localStorage.getItem("mp_currentTrackId");
+
+    // Use the more recent position: if currentPos exists and is greater than lastPos, prefer it
+    let restorePos = lastPos;
+    let restoreTrackData = lastTrackData;
+
+    // If we have a currentTrackId and currentPos, try to find its track data
+    if (currentTrackId && currentPos > 0) {
+      // We need the full track object for that ID. If it's not in mp_lastTrackData, we cannot restore fully.
+      // For simplicity, if mp_lastTrackData matches the ID, use currentPos.
+      try {
+        const parsed = lastTrackData ? JSON.parse(lastTrackData) : null;
+        if (parsed && parsed.id === currentTrackId) {
+          restorePos = currentPos; // use the more frequent save
+        }
+      } catch (e) { }
+    }
+
+    if (restoreTrackData && restorePos > 0) {
+      try {
+        const track = JSON.parse(restoreTrackData);
+        setQueue([track]);
+        setCurrentIndex(0);
+        const a = audioRef.current;
+        if (a) {
+          a.src = track.audio;
+          a.volume = volume;
+          a.addEventListener("canplay", function onCanPlay() {
+            a.currentTime = restorePos;
+            setCurrentTime(restorePos);
+            a.removeEventListener("canplay", onCanPlay);
+          }, { once: true });
+        }
+      } catch (e) { console.warn("Restore failed", e); }
+    }
+  }, []);
+
   /* ── Persist to localStorage ──── */
   useEffect(() => {
     localStorage.setItem("mp_queue", JSON.stringify(userQueue));
@@ -150,11 +193,24 @@ export function PlayerProvider({ children }) {
 
   const clearUserQueue = useCallback(() => setUserQueue([]), []);
 
-  /* ── Audio events ──────────────── */
+  /* ── Audio events ── */
   useEffect(() => {
     const a = audioRef.current;
     if (!a) return;
-    const onTime = () => { if (!seekDragging.current) setCurrentTime(a.currentTime); };
+    const onTime = () => {
+      if (!seekDragging.current) {
+        const ct = a.currentTime;
+        setCurrentTime(ct);
+        // Update OS media widget position (lock screen / notification)
+        if (duration && navigator.mediaSession) {
+          navigator.mediaSession.setPositionState({
+            duration: duration,
+            position: ct,
+            playbackRate: 1
+          });
+        }
+      }
+    };
     const onDur = () => setDuration(a.duration || 0);
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
@@ -162,7 +218,11 @@ export function PlayerProvider({ children }) {
     const onCanPlay = () => { if (!a.paused) setStatus(""); };
     const onEnded = () => {
       if (repeatMode === "one") { a.currentTime = 0; a.play(); }
-      else playNext();
+      else {
+        playNext();
+        // Clear OS widget position when track ends naturally
+        if (navigator.mediaSession) navigator.mediaSession.setPositionState(null);
+      }
     };
     const onError = () => {
       skipErrorCount.current++;
@@ -190,7 +250,7 @@ export function PlayerProvider({ children }) {
       a.removeEventListener("ended", onEnded);
       a.removeEventListener("error", onError);
     };
-  }, [repeatMode, queue, playNext]);
+  }, [repeatMode, queue, playNext, duration]); // added duration dependency
 
   // Sync initial volume from state to audio element
   useEffect(() => { if (audioRef.current) audioRef.current.volume = volume; }, []);
@@ -225,6 +285,25 @@ export function PlayerProvider({ children }) {
     return () => clearInterval(interval);
   }, [currentTrack]);
 
+  /* ── Save full state on pause & before unload (for process resurrection) ── */
+  useEffect(() => {
+    const saveFullState = () => {
+      if (currentTrack && audioRef.current) {
+        localStorage.setItem("mp_lastTrackId", currentTrack.id);
+        localStorage.setItem("mp_lastTrackData", JSON.stringify(currentTrack));
+        localStorage.setItem("mp_lastPosition", audioRef.current.currentTime.toString());
+        localStorage.setItem("mp_wasPlaying", isPlaying ? "true" : "false");
+      }
+    };
+
+    // Save on pause
+    if (!isPlaying && currentTrack) saveFullState();
+
+    // Save before page reload/close
+    window.addEventListener("beforeunload", saveFullState);
+    return () => window.removeEventListener("beforeunload", saveFullState);
+  }, [currentTrack, isPlaying, audioRef.current?.currentTime]);
+
   useEffect(() => {
     const a = audioRef.current;
     if (!a || !currentTrack) return;
@@ -238,6 +317,26 @@ export function PlayerProvider({ children }) {
       a.addEventListener("canplay", onCanPlay);
     }
   }, [currentTrack]);
+
+  /* ── FIX 1 (continued): visibility change sync with OS widget update ── */
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && audioRef.current) {
+        const realTime = audioRef.current.currentTime;
+        setCurrentTime(realTime);
+        // Force OS widget to update with the real position
+        if (duration && navigator.mediaSession) {
+          navigator.mediaSession.setPositionState({
+            duration: duration,
+            position: realTime,
+            playbackRate: 1
+          });
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [duration]);
 
   const seek = useCallback((time) => {
     if (audioRef.current) { audioRef.current.currentTime = time; setCurrentTime(time); }
