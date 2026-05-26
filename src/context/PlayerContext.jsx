@@ -11,9 +11,17 @@ function formatTime(s) {
   return `${m}:${String(sec).padStart(2, "0")}`;
 }
 
+// ─── Single source of truth for persistence ───────────────────────────────────
+// Keys: mp_volume, mp_liked, mp_theme, mp_queue
+// Removed ALL position/track-restore keys — they caused cross-track bleed.
+// The OS widget gets its position purely from live audio element events.
+// ─────────────────────────────────────────────────────────────────────────────
+
 export function PlayerProvider({ children }) {
   const audioRef = useRef(null);
-  const seekDragging = useRef(false);
+  const seekDragging = useRef(false);          // toggled by SeekBar's pointer events
+  const activeTrackIdRef = useRef(null);       // guards stale async callbacks
+  const positionSaveInterval = useRef(null);
 
   const [queue, setQueue] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
@@ -21,28 +29,22 @@ export function PlayerProvider({ children }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // Load volume from localStorage (fallback to 0.2)
   const [volume, setVolumeRaw] = useState(() => {
-    try {
-      const v = localStorage.getItem("mp_volume");
-      return v !== null ? parseFloat(v) : 0.2;
-    } catch { return 0.2; }
+    try { const v = localStorage.getItem("mp_volume"); return v !== null ? parseFloat(v) : 0.2; }
+    catch { return 0.2; }
   });
 
   const [repeatMode, setRepeatMode] = useState("off");
   const [shuffleOn, setShuffleOn] = useState(false);
 
-  // Load userQueue from localStorage
   const [userQueue, setUserQueue] = useState(() => {
     try { return JSON.parse(localStorage.getItem("mp_queue") || "[]"); } catch { return []; }
   });
 
-  // likedMap already loads from localStorage
   const [likedMap, setLikedMap] = useState(() => {
     try { return JSON.parse(localStorage.getItem("mp_liked") || "{}"); } catch { return {}; }
   });
 
-  // Theme State
   const [theme, setThemeRaw] = useState(() => {
     try { return localStorage.getItem("mp_theme") || "midnight"; } catch { return "midnight"; }
   });
@@ -65,81 +67,36 @@ export function PlayerProvider({ children }) {
 
   const currentTrack = currentIndex >= 0 && currentIndex < queue.length ? queue[currentIndex] : null;
 
-  /* ── FIX 3: Aggressive restoration with load() and loadedmetadata ── */
-  useEffect(() => {
-    const lastTrackData = localStorage.getItem("mp_lastTrackData");
-    const lastPos = parseFloat(localStorage.getItem("mp_lastPosition") || "0");
-    // Also check interval-saved position as fallback
-    const currentPos = parseFloat(localStorage.getItem("mp_currentTime") || "0");
-    const currentTrackId = localStorage.getItem("mp_currentTrackId");
+  // ─── Persist simple preferences ────────────────────────────────────────────
+  useEffect(() => { localStorage.setItem("mp_queue", JSON.stringify(userQueue)); }, [userQueue]);
+  useEffect(() => { localStorage.setItem("mp_volume", volume.toString()); }, [volume]);
 
-    let restorePos = lastPos;
-    let restoreTrackData = lastTrackData;
+  // ─── Sync volume to audio element whenever it changes ──────────────────────
+  useEffect(() => { if (audioRef.current) audioRef.current.volume = volume; }, [volume]);
 
-    // Use currentPos if newer and matches same track
-    if (currentPos > 0 && currentTrackId && lastTrackData) {
-      try {
-        const track = JSON.parse(lastTrackData);
-        if (track.id === currentTrackId && currentPos > lastPos) {
-          restorePos = currentPos;
-        }
-      } catch (e) { }
-    }
-
-    if (restoreTrackData && restorePos > 0) {
-      try {
-        const track = JSON.parse(restoreTrackData);
-        setQueue([track]);
-        setCurrentIndex(0);
-        const a = audioRef.current;
-        if (!a) return;
-
-        // Set src and force a full load (clears any browser cached position)
-        a.src = track.audio;
-        a.volume = volume;
-        a.load(); // resets internal media cache
-
-        const setPosition = () => {
-          if (Math.abs(a.currentTime - restorePos) > 0.1) {
-            a.currentTime = restorePos;
-            setCurrentTime(restorePos);
-          }
-          a.removeEventListener("loadedmetadata", setPosition);
-        };
-
-        a.addEventListener("loadedmetadata", setPosition, { once: true });
-
-        // If loadedmetadata never fires, try after short delay
-        setTimeout(() => {
-          if (a.currentTime !== restorePos && a.readyState >= 1) {
-            a.currentTime = restorePos;
-            setCurrentTime(restorePos);
-          }
-        }, 500);
-
-      } catch (e) { console.warn("Restore failed", e); }
-    }
-  }, []);
-
-  /* ── Persist to localStorage ──── */
-  useEffect(() => {
-    localStorage.setItem("mp_queue", JSON.stringify(userQueue));
-  }, [userQueue]);
-
-  useEffect(() => {
-    localStorage.setItem("mp_volume", volume.toString());
-  }, [volume]);
-
-  /* ── Core playback ─────────────── */
+  // ─── Core playback ─────────────────────────────────────────────────────────
+  // Each call to playTrack tags the audio element with the track id so that
+  // any stale async callback (canplay, loadedmetadata) can bail if a newer
+  // track was already requested.
   const playTrack = useCallback((track, newQueue, index) => {
     if (!track?.audio) return;
     skipErrorCount.current = 0;
-    setQueue(newQueue || queue);
+    const resolvedQueue = newQueue || queue;
+    setQueue(resolvedQueue);
     setCurrentIndex(index);
+    activeTrackIdRef.current = track.id;
+
+    // Reset UI state immediately so seekbar shows 0
+    setCurrentTime(0);
+    setDuration(0);
+
     const a = audioRef.current;
     if (a) {
+      a.pause();
       a.src = track.audio;
+      a.currentTime = 0;
       a.volume = volume;
+      a.load();
       a.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
     }
   }, [volume, queue]);
@@ -147,10 +104,11 @@ export function PlayerProvider({ children }) {
   const togglePlay = useCallback(() => {
     const a = audioRef.current;
     if (!a?.src) return;
-    if (a.paused) a.play().then(() => setIsPlaying(true)).catch(() => { });
+    if (a.paused) a.play().then(() => setIsPlaying(true)).catch(() => {});
     else { a.pause(); setIsPlaying(false); }
   }, []);
 
+  // playNext and playPrev also reset time immediately
   const playNext = useCallback(() => {
     if (!queue.length) return;
     let nextIdx;
@@ -159,210 +117,219 @@ export function PlayerProvider({ children }) {
       if (queue.length > 1) while (nextIdx === currentIndex) nextIdx = Math.floor(Math.random() * queue.length);
     } else {
       nextIdx = currentIndex + 1;
-      if (nextIdx >= queue.length) { if (repeatMode === "all") nextIdx = 0; else { setIsPlaying(false); return; } }
+      if (nextIdx >= queue.length) {
+        if (repeatMode === "all") nextIdx = 0;
+        else { setIsPlaying(false); return; }
+      }
     }
     const track = queue[nextIdx];
-    if (track?.audio) {
-      setCurrentIndex(nextIdx);
-      skipErrorCount.current = 0;
-      const a = audioRef.current;
-      if (a) {
-        a.src = track.audio;
-        a.volume = volume;
-        a.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
-      }
+    if (!track?.audio) return;
+    skipErrorCount.current = 0;
+    activeTrackIdRef.current = track.id;
+
+    setCurrentIndex(nextIdx);
+    setCurrentTime(0);
+    setDuration(0);
+
+    const a = audioRef.current;
+    if (a) {
+      a.pause();
+      a.src = track.audio;
+      a.currentTime = 0;
+      a.volume = volume;
+      a.load();
+      a.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
     }
   }, [queue, currentIndex, shuffleOn, repeatMode, volume]);
 
   const playPrev = useCallback(() => {
+    const a = audioRef.current;
+    // If more than 3 s into the track, restart instead of going to prev
+    if (a && a.currentTime > 3) {
+      a.currentTime = 0;
+      setCurrentTime(0);
+      return;
+    }
     let prevIdx = currentIndex - 1;
     if (prevIdx < 0) prevIdx = repeatMode === "all" ? queue.length - 1 : 0;
     const track = queue[prevIdx];
-    if (track?.audio) {
-      setCurrentIndex(prevIdx);
-      const a = audioRef.current;
-      if (a) {
-        a.src = track.audio;
-        a.volume = volume;
-        a.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
-      }
+    if (!track?.audio) return;
+    activeTrackIdRef.current = track.id;
+
+    setCurrentIndex(prevIdx);
+    setCurrentTime(0);
+    setDuration(0);
+
+    if (a) {
+      a.pause();
+      a.src = track.audio;
+      a.currentTime = 0;
+      a.volume = volume;
+      a.load();
+      a.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
     }
   }, [queue, currentIndex, repeatMode, volume]);
 
-  /* ── User Queue Management ─────── */
-  const isInUserQueue = useCallback((id) => userQueue.some(t => t.id === id), [userQueue]);
-
-  const toggleUserQueue = useCallback((track) => {
-    setUserQueue(prev => {
-      const exists = prev.some(t => t.id === track.id);
-      if (exists) return prev.filter(t => t.id !== track.id);
-      return [...prev, { ...track, queueId: Date.now() + Math.random() }];
-    });
+  // ─── Seek (called from SeekBar) ─────────────────────────────────────────────
+  const seek = useCallback((time) => {
+    const a = audioRef.current;
+    if (!a) return;
+    a.currentTime = time;
+    setCurrentTime(time);
+    // Immediately push the new position to the OS widget
+    if (isFinite(a.duration) && a.duration > 0 && navigator.mediaSession) {
+      navigator.mediaSession.setPositionState({
+        duration: a.duration,
+        position: time,
+        playbackRate: a.playbackRate ?? 1,
+      });
+    }
   }, []);
 
-  const removeFromUserQueue = useCallback((queueId) => {
-    setUserQueue(prev => prev.filter(t => t.queueId !== queueId));
-  }, []);
-
-  const clearUserQueue = useCallback(() => setUserQueue([]), []);
-
-  /* ── Audio events ── */
+  // ─── Audio element events ────────────────────────────────────────────────────
   useEffect(() => {
     const a = audioRef.current;
     if (!a) return;
+
     const onTime = () => {
-      if (!seekDragging.current) {
-        const ct = a.currentTime;
-        setCurrentTime(ct);
-        // Update OS media widget position (lock screen / notification)
-        if (duration && navigator.mediaSession) {
+      if (seekDragging.current) return;
+      const ct = a.currentTime;
+      setCurrentTime(ct);
+
+      // Keep OS widget in sync — guard against NaN/Infinity
+      if (isFinite(a.duration) && a.duration > 0 && navigator.mediaSession) {
+        try {
           navigator.mediaSession.setPositionState({
-            duration: duration,
+            duration: a.duration,
             position: ct,
-            playbackRate: 1
+            playbackRate: a.playbackRate ?? 1,
           });
-        }
+        } catch (_) {}
       }
     };
-    const onDur = () => setDuration(a.duration || 0);
+
+    const onDurationChange = () => {
+      const d = a.duration;
+      if (isFinite(d) && d > 0) setDuration(d);
+    };
+
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
-    const onWait = () => setStatus("Buffering...");
+    const onWaiting = () => setStatus("Buffering...");
     const onCanPlay = () => { if (!a.paused) setStatus(""); };
+
+    // When a track naturally ends, clear the OS widget position before advancing
     const onEnded = () => {
-      if (repeatMode === "one") { a.currentTime = 0; a.play(); }
-      else {
+      if (navigator.mediaSession) {
+        try { navigator.mediaSession.setPositionState(null); } catch (_) {}
+      }
+      if (repeatMode === "one") {
+        a.currentTime = 0;
+        setCurrentTime(0);
+        a.play();
+      } else {
         playNext();
-        // Clear OS widget position when track ends naturally
-        if (navigator.mediaSession) navigator.mediaSession.setPositionState(null);
       }
     };
+
     const onError = () => {
       skipErrorCount.current++;
       setIsPlaying(false);
-      if (skipErrorCount.current >= 3) { setStatus("Multiple tracks unavailable."); skipErrorCount.current = 0; return; }
-      setStatus(`Track unavailable, skipping...`);
+      if (skipErrorCount.current >= 3) {
+        setStatus("Multiple tracks unavailable.");
+        skipErrorCount.current = 0;
+        return;
+      }
+      setStatus("Track unavailable, skipping...");
       if (queue.length > 1) setTimeout(() => playNext(), 600);
     };
 
     a.addEventListener("timeupdate", onTime);
-    a.addEventListener("durationchange", onDur);
+    a.addEventListener("durationchange", onDurationChange);
     a.addEventListener("play", onPlay);
     a.addEventListener("pause", onPause);
-    a.addEventListener("waiting", onWait);
+    a.addEventListener("waiting", onWaiting);
     a.addEventListener("canplay", onCanPlay);
     a.addEventListener("ended", onEnded);
     a.addEventListener("error", onError);
+
     return () => {
       a.removeEventListener("timeupdate", onTime);
-      a.removeEventListener("durationchange", onDur);
+      a.removeEventListener("durationchange", onDurationChange);
       a.removeEventListener("play", onPlay);
       a.removeEventListener("pause", onPause);
-      a.removeEventListener("waiting", onWait);
+      a.removeEventListener("waiting", onWaiting);
       a.removeEventListener("canplay", onCanPlay);
       a.removeEventListener("ended", onEnded);
       a.removeEventListener("error", onError);
     };
-  }, [repeatMode, queue, playNext, duration]); // added duration dependency
+  }, [repeatMode, queue, playNext]);
 
-  // Sync initial volume from state to audio element
-  useEffect(() => { if (audioRef.current) audioRef.current.volume = volume; }, []);
-
+  // ─── OS Media Session metadata ───────────────────────────────────────────────
   useEffect(() => {
     if (!currentTrack || !("mediaSession" in navigator)) return;
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: currentTrack.name, artist: currentTrack.artist,
+      title: currentTrack.name,
+      artist: currentTrack.artist,
       artwork: currentTrack.image ? [{ src: currentTrack.image, sizes: "512x512", type: "image/jpeg" }] : [],
     });
     navigator.mediaSession.setActionHandler("play", () => togglePlay());
     navigator.mediaSession.setActionHandler("pause", () => togglePlay());
     navigator.mediaSession.setActionHandler("previoustrack", () => playPrev());
     navigator.mediaSession.setActionHandler("nexttrack", () => playNext());
-  }, [currentTrack, togglePlay, playPrev, playNext]);
+    // Allow the OS widget seek bar to work
+    navigator.mediaSession.setActionHandler("seekto", (details) => {
+      if (details.seekTime != null) seek(details.seekTime);
+    });
+    navigator.mediaSession.setActionHandler("seekforward", (details) => {
+      seek(Math.min((audioRef.current?.currentTime ?? 0) + (details.seekOffset ?? 10), audioRef.current?.duration ?? 0));
+    });
+    navigator.mediaSession.setActionHandler("seekbackward", (details) => {
+      seek(Math.max((audioRef.current?.currentTime ?? 0) - (details.seekOffset ?? 10), 0));
+    });
+  }, [currentTrack, togglePlay, playPrev, playNext, seek]);
 
-  // Tell the phone widget when we are playing/paused so it updates immediately
   useEffect(() => {
     if ("mediaSession" in navigator) {
       navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
     }
   }, [isPlaying]);
 
-  // Saves current playback position every second for crash recovery
+  // Re-sync OS widget when app comes back to foreground (phone background → foreground)
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (audioRef.current && !audioRef.current.paused) {
-        localStorage.setItem("mp_currentTime", audioRef.current.currentTime.toString());
-        localStorage.setItem("mp_currentTrackId", currentTrack?.id || "");
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [currentTrack]);
-
-  /* ── Save full state on pause & before unload (for process resurrection) ── */
-  useEffect(() => {
-    const saveFullState = () => {
-      if (currentTrack && audioRef.current) {
-        localStorage.setItem("mp_lastTrackId", currentTrack.id);
-        localStorage.setItem("mp_lastTrackData", JSON.stringify(currentTrack));
-        localStorage.setItem("mp_lastPosition", audioRef.current.currentTime.toString());
-        localStorage.setItem("mp_wasPlaying", isPlaying ? "true" : "false");
-      }
-    };
-
-    // Save on pause
-    if (!isPlaying && currentTrack) saveFullState();
-
-    // Save before page reload/close
-    window.addEventListener("beforeunload", saveFullState);
-    return () => window.removeEventListener("beforeunload", saveFullState);
-  }, [currentTrack, isPlaying, audioRef.current?.currentTime]);
-
-  useEffect(() => {
-    const a = audioRef.current;
-    if (!a || !currentTrack) return;
-    const savedId = localStorage.getItem("mp_currentTrackId");
-    const savedTime = parseFloat(localStorage.getItem("mp_currentTime") || "0");
-    if (savedId === currentTrack.id && savedTime > 0) {
-      const onCanPlay = () => {
-        a.currentTime = savedTime;
-        a.removeEventListener("canplay", onCanPlay);
-      };
-      a.addEventListener("canplay", onCanPlay);
-    }
-  }, [currentTrack]);
-
-  /* ── FIX 1 (continued): visibility change sync with OS widget update ── */
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && audioRef.current) {
-        const realTime = audioRef.current.currentTime;
-        setCurrentTime(realTime);
-        // Force OS widget to update with the real position
-        if (duration && navigator.mediaSession) {
-          navigator.mediaSession.setPositionState({
-            duration: duration,
-            position: realTime,
-            playbackRate: 1
-          });
+    const handleVisibility = () => {
+      const a = audioRef.current;
+      if (document.visibilityState === "visible" && a) {
+        const ct = a.currentTime;
+        setCurrentTime(ct);
+        if (isFinite(a.duration) && a.duration > 0 && navigator.mediaSession) {
+          try {
+            navigator.mediaSession.setPositionState({
+              duration: a.duration,
+              position: ct,
+              playbackRate: a.playbackRate ?? 1,
+            });
+          } catch (_) {}
         }
       }
     };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [duration]);
-
-  const seek = useCallback((time) => {
-    if (audioRef.current) { audioRef.current.currentTime = time; setCurrentTime(time); }
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, []);
 
-  const setVolume = useCallback((v) => {
-    setVolumeRaw(v);
-    if (audioRef.current) audioRef.current.volume = v;
+  // ─── User Queue Management ───────────────────────────────────────────────────
+  const isInUserQueue = useCallback((id) => userQueue.some((t) => t.id === id), [userQueue]);
+  const toggleUserQueue = useCallback((track) => {
+    setUserQueue((prev) => {
+      const exists = prev.some((t) => t.id === track.id);
+      if (exists) return prev.filter((t) => t.id !== track.id);
+      return [...prev, { ...track, queueId: Date.now() + Math.random() }];
+    });
   }, []);
+  const removeFromUserQueue = useCallback((queueId) => setUserQueue((prev) => prev.filter((t) => t.queueId !== queueId)), []);
+  const clearUserQueue = useCallback(() => setUserQueue([]), []);
 
-  const toggleRepeat = useCallback(() => setRepeatMode((p) => (p === "off" ? "all" : p === "all" ? "one" : "off")), []);
-  const toggleShuffle = useCallback(() => setShuffleOn((p) => !p), []);
-
+  // ─── Liked Tracks ────────────────────────────────────────────────────────────
   const toggleLike = useCallback((track) => {
     setLikedMap((prev) => {
       const next = { ...prev };
@@ -371,15 +338,21 @@ export function PlayerProvider({ children }) {
       return next;
     });
   }, []);
-
-  const clearLiked = useCallback(() => {
-    setLikedMap({});
-    localStorage.setItem("mp_liked", "{}");
-  }, []);
-
+  const clearLiked = useCallback(() => { setLikedMap({}); localStorage.setItem("mp_liked", "{}"); }, []);
   const isLiked = useCallback((id) => !!likedMap[id], [likedMap]);
   const likedTracks = Object.values(likedMap);
 
+  // ─── Volume ──────────────────────────────────────────────────────────────────
+  const setVolume = useCallback((v) => {
+    setVolumeRaw(v);
+    if (audioRef.current) audioRef.current.volume = v;
+  }, []);
+
+  // ─── Repeat / Shuffle ────────────────────────────────────────────────────────
+  const toggleRepeat = useCallback(() => setRepeatMode((p) => (p === "off" ? "all" : p === "all" ? "one" : "off")), []);
+  const toggleShuffle = useCallback(() => setShuffleOn((p) => !p), []);
+
+  // ─── Spacebar shortcut ───────────────────────────────────────────────────────
   useEffect(() => {
     const handler = (e) => {
       if (e.target.tagName === "INPUT") return;
@@ -390,7 +363,8 @@ export function PlayerProvider({ children }) {
   }, [togglePlay]);
 
   const value = {
-    audioRef, queue, setQueue, currentIndex, setCurrentIndex, currentTrack,
+    audioRef, seekDragging,
+    queue, setQueue, currentIndex, setCurrentIndex, currentTrack,
     isPlaying, currentTime, duration, volume, status, setStatus,
     repeatMode, shuffleOn, apiSource, setApiSource,
     currentView, setCurrentView, showNP, setShowNP,
@@ -398,7 +372,7 @@ export function PlayerProvider({ children }) {
     playTrack, togglePlay, playNext, playPrev, seek, setVolume,
     toggleRepeat, toggleShuffle, toggleLike, clearLiked,
     userQueue, isInUserQueue, toggleUserQueue, removeFromUserQueue, clearUserQueue,
-    theme, setTheme, seekDragging,
+    theme, setTheme,
   };
 
   return (
