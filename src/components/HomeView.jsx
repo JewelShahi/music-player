@@ -8,7 +8,7 @@ import { TrendingUp, Shuffle, Play, Search, Music2 } from "lucide-react";
 export function HomeView() {
   const { GENRES, playTrack, apiSource, setShuffleOn, shuffleOn } = usePlayer();
   const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState(""); // The delayed version
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [genre, setGenre] = useState("");
   const [page, setPage] = useState(0);
   const [tracks, setTracks] = useState([]);
@@ -31,7 +31,7 @@ export function HomeView() {
   }, [debouncedQuery, genre]);
 
   const isSearching = debouncedQuery.trim().length > 0;
-  const isDebouncing = query !== debouncedQuery; // True while user is typing and 1s hasn't passed
+  const isDebouncing = query !== debouncedQuery;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -104,10 +104,10 @@ export function HomeView() {
   return (
     <div className="max-w-5xl mx-auto px-4 lg:px-8 pt-6 pb-8">
 
-      {/* ── Mobile-only header (hidden on lg where sidebar shows) ── */}
+      {/* ── Mobile-only header ── */}
       <div className="flex lg:hidden flex-col items-center justify-center gap-3 mb-8 px-5 py-4 rounded-2xl bg-base-200/60 border border-base-300/40 shadow-sm">
 
-        {/* Top row: icon + app name */}
+        {/* Top row - App name and icon */}
         <div className="flex items-center gap-3">
 
           <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-md shadow-primary/20 shrink-0">
@@ -120,7 +120,7 @@ export function HomeView() {
 
         </div>
 
-        {/* Bottom row: type + author */}
+        {/* Bottom row - App description and github link */}
         <div className="flex flex-wrap items-center gap-1">
 
           <p className="text-[11px] text-base-content/60">
@@ -130,7 +130,7 @@ export function HomeView() {
           <span className="text-base-content/30 text-[9px]">•</span>
 
           <p className="text-[11px] text-base-content/60 break-words">
-            Jewel Shahi
+            <a href="https://github.com/JewelShahi">Jewel Shahi</a>
           </p>
 
         </div>
@@ -164,7 +164,7 @@ export function HomeView() {
 
       {/* ── Search Input ── */}
       <div className="relative mb-4 group">
-        {/* Show spinner while debouncing, Search icon when idle */}
+        {/* Show spinner while debouncing */}
         {isDebouncing ? (
           <span className="absolute left-4 top-1/2 -translate-y-1/2 loading loading-spinner loading-xs text-primary" />
         ) : (
