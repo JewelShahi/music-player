@@ -3,7 +3,7 @@ import { usePlayer } from "../context/PlayerContext";
 import AlbumArt from "./AlbumArt";
 import { Play, Heart, ListPlus } from "lucide-react";
 
-// ── Custom Hook: Checks if the text is actually showing "..." ──
+// ── Custom hook for checking if the text is actually showing "..." ──
 function useIsTruncated(ref, deps = []) {
   const [isTruncated, setIsTruncated] = useState(false);
 
@@ -37,7 +37,7 @@ function TrackRow({ track, index, tracks }) {
   const titleLen = track.name.length;
   const artistLen = track.artist.length;
 
-  // Desktop DOM measurement checks
+  // Desktop dom measurement checks
   const desktopTitleRef = useRef(null);
   const desktopArtistRef = useRef(null);
   const isDesktopTitleTruncated = useIsTruncated(desktopTitleRef, [track.name, active]);
@@ -72,7 +72,7 @@ function TrackRow({ track, index, tracks }) {
             )}
           </span>
         ) : (
-          // If the track is NOT active, show the number, 
+          // If the track is not active, show the number, 
           // and on hover, fade out the number and fade in the Play icon.
           <>
             <span className="text-xs font-mono text-base-content/60 absolute inset-0 flex items-center justify-center transition-opacity group-hover:opacity-0">
@@ -136,7 +136,7 @@ function TrackRow({ track, index, tracks }) {
               <p className="text-xs text-base-content/50 truncate sm:hidden">{track.artist}</p>
             )}
 
-            {/* ── Desktop Artist: Marquee ONLY if truncated by browser ── */}
+            {/* ── Desktop Artist: Marquee only if truncated by browser ── */}
             {isDesktopArtistTruncated ? (
               <div className="marquee-container hidden sm:block">
                 <p className="text-xs text-base-content/50 marquee-content marquee-content-artist">
