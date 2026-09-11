@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import AlbumArt from "./AlbumArt";
 
-// ── Moved outside — stable identity, no remount on tick ──
+// ── Moved outside, stable identity, no remount on tick ──
 
 const SeekBar = ({ currentSliderVal, currentPct, onStart, onChange, onEnd, className }) => (
   <input
@@ -116,10 +116,10 @@ export default function Player() {
           <div className="np-ambient" style={{ backgroundImage: `url('${currentTrack.image}')` }} />
         )}
 
-        {/* Primary Color Tint Layer */}
+        {/* Primary color tint layer */}
         <div className="absolute inset-0 bg-primary/30" />
 
-        {/* Dark Overlay Layer */}
+        {/* Dark overlay layer */}
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
         <div className="relative z-10">
@@ -156,7 +156,7 @@ export default function Player() {
                     ) : (
                       <p className="text-sm font-semibold truncate">{currentTrack.name}</p>
                     )}
-                    {/* Desktop Artist: Always static/truncated */}
+                    {/* Desktop Artist - always static/truncated */}
                     <p className="text-xs text-base-content/50 truncate">{currentTrack.artist}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0 ml-1">
@@ -245,17 +245,17 @@ export default function Player() {
         </div>
       </div>
 
-      {/* ── Mobile Player + Tabs ──────── */}
+      {/* ── Mobile player with tabs ──────── */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col">
         <div className="border-t border-base-content/5 overflow-hidden relative">
           {currentTrack?.image && (
             <div className="np-ambient" style={{ backgroundImage: `url('${currentTrack.image}')` }} />
           )}
 
-          {/* Primary Color Tint Layer */}
+          {/* Primary volor tint layer */}
           <div className="absolute inset-0 bg-primary/30" />
 
-          {/* Dark Overlay Layer */}
+          {/* Dark overlay layer */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
           <div className="relative z-10">
