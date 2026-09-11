@@ -3,7 +3,7 @@ import { usePlayer } from "../context/PlayerContext";
 import AlbumArt from "./AlbumArt";
 import { Home, ListMusic, Heart, Music2, Wifi, WifiOff, Palette } from "lucide-react";
 
-// ── Custom Hook: Checks if text is actually truncating ──
+// ── Custom hook for checks if text is actually truncating ──
 function useIsTruncated(ref, deps = []) {
   const [isTruncated, setIsTruncated] = useState(false);
   useEffect(() => {
@@ -100,7 +100,7 @@ export default function Sidebar({ initing }) {
         </div>
         <div>
           <h1 className="text-sm font-bold tracking-tight">Audify</h1>
-          <p className="text-[10px] text-base-content/50 font-medium">Music Player • Jewel Shahi</p>
+          <p className="text-[10px] text-base-content/50 font-medium">Music Player • <a href="https://github.com/JewelShahi">Jewel Shahi</a></p>
         </div>
       </div>
 
@@ -140,7 +140,7 @@ export default function Sidebar({ initing }) {
         </div>
       </div>
 
-      {/* Now playing mini*/}
+      {/* Now playing mini */}
       <MiniNowPlaying currentTrack={currentTrack} isPlaying={isPlaying} />
     </aside>
   );
