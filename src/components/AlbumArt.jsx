@@ -4,7 +4,7 @@ import { Music } from "lucide-react";
 const AlbumArt = ({ src, className }) => {
   const [broken, setBroken] = useState(false);
 
-  // Clean the src: remove empty strings or whitespace so they count as "no image"
+  // Remove empty strings or whitespace so they count as "no image"
   const cleanSrc = src && src.trim() ? src.trim() : null;
 
   // Reset the broken state whenever the image URL changes
