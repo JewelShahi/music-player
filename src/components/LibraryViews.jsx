@@ -3,7 +3,7 @@ import { usePlayer } from "../context/PlayerContext";
 import AlbumArt from "./AlbumArt";
 import { ListMusic, Heart, Play, Shuffle, X, Trash2, ListPlus } from "lucide-react";
 
-// ── Custom Hook: Checks if text is actually truncating ──
+// ── Custom Hook for checking if text is actually truncating ──
 function useIsTruncated(ref, deps = []) {
   const [isTruncated, setIsTruncated] = useState(false);
   useEffect(() => {
@@ -20,7 +20,7 @@ function useIsTruncated(ref, deps = []) {
   return isTruncated;
 }
 
-// ── Queue Item Sub-component ──
+// ── Queue item sub-component ──
 function QueueItem({ track, index, isActive, isPlaying, playFromQueue, removeFromUserQueue }) {
   const [isHovered, setIsHovered] = useState(false);
   const shouldScroll = isActive || isHovered;
@@ -42,7 +42,7 @@ function QueueItem({ track, index, isActive, isPlaying, playFromQueue, removeFro
       <div className="flex-1 cursor-pointer min-w-0" onClick={() => playFromQueue(index)}>
         <div className="flex items-center gap-3 px-2 sm:px-3 py-2.5">
 
-          {/* Number / Equalizer / Play Button Logic - VISIBLE ON ALL SCREENS */}
+          {/* Number / Equalizer / Play Button Logic - visible on every screen */}
           <span className={`relative flex w-6 h-4 justify-center items-center text-xs font-mono ${isActive ? "text-primary" : "text-base-content/40"}`}>
             {isActive && isPlaying ? (
               <span className="flex items-end justify-center gap-0.5 h-4">
@@ -118,7 +118,7 @@ function QueueItem({ track, index, isActive, isPlaying, playFromQueue, removeFro
   );
 }
 
-// ── Liked Item Sub-component ──
+// ── Liked item sub-component ──
 function LikedItem({ track, index, isActive, isPlaying, playFromLiked, toggleLike }) {
   const [isHovered, setIsHovered] = useState(false);
   const shouldScroll = isActive || isHovered;
@@ -140,7 +140,7 @@ function LikedItem({ track, index, isActive, isPlaying, playFromLiked, toggleLik
       <div className="flex-1 cursor-pointer min-w-0" onClick={() => playFromLiked(index)}>
         <div className="flex items-center gap-3 px-2 sm:px-3 py-2.5">
 
-          {/* Number / Equalizer / Play Button Logic - VISIBLE ON ALL SCREENS */}
+          {/* Number / Equalizer / Play Button Logic - on every screen */}
           <span className={`relative flex w-6 h-4 justify-center items-center text-xs font-mono ${isActive ? "text-primary" : "text-base-content/40"}`}>
             {isActive && isPlaying ? (
               <span className="flex items-end justify-center gap-0.5 h-4">
@@ -230,7 +230,7 @@ export function QueueView() {
   const playAll = (shuffle = false) => {
     if (!userQueue.length) return;
 
-    // Tell the global player to turn shuffle ON or OFF
+    // Global player to turn shuffle ON or OFF
     setShuffleOn(shuffle);
 
     if (shuffle) {
@@ -323,7 +323,7 @@ export function LikedView() {
   const playAll = (shuffle = false) => {
     if (!likedTracks.length) return;
 
-    // Tell the global player to turn shuffle ON or OFF
+    // Global player to turn shuffle ON or OFF
     setShuffleOn(shuffle);
 
     if (shuffle) {
